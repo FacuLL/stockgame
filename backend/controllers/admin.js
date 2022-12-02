@@ -3,7 +3,8 @@ var encrypt = require('../encrypt');
 var exports = module.exports = {};
 
 exports.checkAdmin = (req, response, next) => {
-    con.query(`SELECT admin FROM user WHERE userid=${req.userid}`,
+    if(req.team) return response.sendStatus(403);
+    con.query(`SELECT admin FROM basicuser WHERE userid=${req.userid}`,
         (err, res) => {
             if (err) return response.status(500).json({error: err.message});
             if (res[0].admin==0) return response.sendStatus(403);
@@ -14,10 +15,10 @@ exports.checkAdmin = (req, response, next) => {
 exports.createUser = (req, response) => {
     encrypt.encryptPassword(req.body.password, 
     (error, hash) => {
-        con.query(`INSERT INTO user (username, name, password) VALUES ('${req.body.username}', '${req.body.name}', '${hash}')`,
+        con.query(`INSERT INTO user (name) VALUES ('${req.body.name}')`,
         (err, res) => {
             if (err) return response.status(500).json({error: err.message});
-            con.query(`INSERT INTO basicuser (userid, email, dni) VALUES (${res.insertId}, '${req.body.email}', ${req.body.dni})`,
+            con.query(`INSERT INTO basicuser (userid, email, dni, username, password) VALUES (${res.insertId}, '${req.body.email}', ${req.body.dni}, '${req.body.username}', '${hash}')`,
             (err2, res2) => {
                 if (err2) return response.status(500).json({error: err2.message});
                 return response.sendStatus(200);
@@ -35,7 +36,7 @@ exports.deleteUser = (req, response) => {
 }
 
 exports.toggleAdmin = (req, response) => {
-    con.query(`UPDATE basicuser SET admin=NOT admin WHERE userid=${req.body.userid};`,
+    con.query(`UPDATE basicuser SET admin=NOT admin WHERE userid=${req.params.userid};`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.sendStatus(200);
@@ -43,7 +44,7 @@ exports.toggleAdmin = (req, response) => {
 }
 
 exports.getUsers = (req, response) => {
-    con.query(`SELECT userid, username, name, image, team, publicprofile FROM user`,
+    con.query(`SELECT u.*, bu.username, bu.email, bu.dni, bu.admin FROM user u INNER JOIN basicuser bu ON u.userid=bu.userid INNER JOIN team ON u.userid=t.userid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -51,7 +52,7 @@ exports.getUsers = (req, response) => {
 }
 
 exports.getUser = (req, response) => {
-    con.query(`SELECT userid, username, name, image, team, publicprofile FROM user WHERE userid=${req.params.userid}`,
+    con.query(`SELECT u.*, bu.username, bu.email, bu.dni, bu.admin FROM user u INNER JOIN basicuser bu ON u.userid=${req.params.userid} AND u.userid=bu.userid INNER JOIN team ON u.userid=t.userid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -60,6 +61,14 @@ exports.getUser = (req, response) => {
 
 exports.getTeams = (req, response) => {
     con.query(`SELECT * FROM user NATURAL JOIN team`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        return response.status(200).json(res);
+    });
+}
+
+exports.getTeam = (req, response) => {
+    con.query(`SELECT * FROM user NATURAL JOIN team WHERE teamid=${req.params.teamid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -131,7 +140,7 @@ exports.getGameTransactions = (req, response) => {
 }
 
 exports.getGameCurrencyTransactions = (req, response) => {
-    con.query(`SELECT * FROM currencytransaction WHERE gameid=${req.body.gameid}`,
+    con.query(`SELECT * FROM currencytransaction WHERE gameid=${req.params.gameid}`,
     (err, res) => {
         if (err) response.status(500).json({error: err.message});
         response.status(200).json(res);

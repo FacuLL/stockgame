@@ -3,7 +3,6 @@ var encrypt = require('../encrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { json } = require('body-parser');
-const { timingSafeEqual } = require('crypto');
 
 var exports = module.exports = {};
 
@@ -15,10 +14,17 @@ exports.checkToken = (req, response, next) => {
     if (!token) return response.status(403).json({error: 'No token'});
     jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {
         if (error) return response.status(403).json({error: error.message});
-        con.query(`SELECT * FROM user WHERE userid=${user.userid} AND username='${user.username}'`,
+        con.query(`SELECT * FROM basicuser WHERE userid=${user.userid} AND username='${user.username}'`,
         (err, res) => {
             if (err) return response.status(500).json({error: err.message});
             if (res.length <= 0) return response.status(403).json({error: 'Invalid token'});
+            if (res.team===1) {
+                con.query(`SELECT tp.* FROM teamparticipants tp INNER JOIN team t ON tp.teamid=t.teamid AND t.userid=${user.userid} AND tp.userid=${user.loggeduserid}`,
+                (err2, res2) => {
+                    if (err2) return response.status(500).json({error: err2.message});
+                    if (res2.length <= 0) return response.status(403).json({error: "User isn't in team"});
+                });
+            }
             req.userid=user.userid;
             req.username=user.username;
             req.team=user.team;
@@ -29,17 +35,19 @@ exports.checkToken = (req, response, next) => {
 }
 
 exports.login = (req, response) => {
-    con.query(`SELECT * FROM user WHERE username='${req.body.username}'`,
+    con.query(`SELECT * FROM basicuser WHERE username='${req.body.username}'`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
+        if (res.length <= 0) return response.sendStatus(403).json({error: "Username or password invalid"});
         encrypt.comparePassword(req.body.password, res[0].password,
         (error, match) => {
             if (error) return response.status(500).json({error: error.message});
-            if(!match) return response.sendStatus(403);
+            if(!match) return response.sendStatus(403).json({error: "Username or password invalid"});
+            if (res[0].team===1) return response.sendStatus(403).json({error: "Can't login into a team"});
             let payload = {
                 userid: res[0].userid,
                 username: res[0].username,
-                team: res[0].team
+                team: !!res[0].team
             }
             let token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
             return response.status(200).json({token: token});
@@ -146,7 +154,7 @@ exports.createCurrencyTransaction = (req, response) => {
 }
 
 exports.getProfile = (req, response) => {
-    con.query(`SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, u.username, t.creatorid FROM user u LEFT JOIN team t ON u.userid=t.userid) b WHERE userid=${req.userid}`,
+    con.query(`SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, bu.username, t.creatorid FROM user u LEFT JOIN team t ON u.userid=t.userid LEFT JOIN basicuser bu ON u.userid=bu.userid) b WHERE userid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message, code: err.sqlState});
         return response.status(200).json(res[0]);
@@ -157,11 +165,13 @@ exports.updateProfile = (req, response) => {
     con.query(`UPDATE user SET name='${req.body.name}', publicprofile=${req.body.publicprofile} WHERE userid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
-        con.query(`UPDATE basicuser SET email='${req.body.email}', dni=${req.body.dni} WHERE userid=${req.userid}`,
-        (err2, res2) => {
-            if (err2) return response.status(500).json({error: err2.message});
-            return response.sendStatus(200);
-        });
+        if (!req.team) {
+            con.query(`UPDATE basicuser SET email='${req.body.email}', dni=${req.body.dni} WHERE userid=${req.userid}`,
+            (err2, res2) => {
+                if (err2) return response.status(500).json({error: err2.message});
+                return response.sendStatus(200);
+            });
+        }
     });
 }
 
@@ -170,7 +180,7 @@ exports.recoverPassword = (req, response) => {
 }
 
 exports.getUser = (req, response) => {
-    con.query(`SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, u.username, t.creatorid FROM user u LEFT JOIN team t ON u.userid=t.userid) b WHERE userid=${req.params.userid} AND publicprofile=1;`,
+    con.query(`SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, t.creatorid, bu.username FROM user u LEFT JOIN team t ON u.userid=t.userid LEFT JOIN basicuser bu ON u.userid=bu.userid) b WHERE userid=${req.params.userid} AND publicprofile=1;`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res[0]);
@@ -178,7 +188,7 @@ exports.getUser = (req, response) => {
 }
 
 exports.switchToTeam = (req, response) => {
-    if (req.loggeduserid) return response.status(500).json({error: "Switch to user first"})
+    if (req.team) return response.status(500).json({error: "Switch to user first"})
     con.query(`SELECT * FROM user u INNER JOIN team t ON u.userid=t.userid AND u.team=1 AND t.teamid=${req.params.teamid} INNER JOIN teamparticipants tp ON t.teamid=tp.teamid AND tp.userid=${req.userid}`,
     (err, res) => {
         if (res.length <= 0) return response.status(403).json({error: "You don't play in this team"}); 
@@ -186,7 +196,7 @@ exports.switchToTeam = (req, response) => {
             let payload = {
                 userid: res[0].userid,
                 username: res[0].username,
-                team: res[0].team,
+                team: !!res[0].team,
                 loggeduserid: req.userid
             }
             let token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
@@ -195,7 +205,7 @@ exports.switchToTeam = (req, response) => {
 }
 
 exports.switchToUser = (req, response) => {
-    if (!req.loggeduserid) return response.status(500).json({error: "Switch to team first"})
+    if (!req.team) return response.status(500).json({error: "Switch to team first"})
     con.query(`SELECT * FROM user WHERE userid=${req.loggeduserid}`,
     (err, res) => {
         if (res.length <= 0) return response.status(403).json({error: "Previous user wasn't found"}); 
@@ -203,7 +213,7 @@ exports.switchToUser = (req, response) => {
             let payload = {
                 userid: res[0].userid,
                 username: res[0].username,
-                team: res[0].team
+                team: !!res[0].team
             }
             let token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
             return response.status(200).json({token: token});
@@ -211,7 +221,7 @@ exports.switchToUser = (req, response) => {
 }
 
 exports.getOwnerTeams = (req, response) => {
-    con.query(`SELECT u.userid, u.name, u.image, u.team, u.publicprofile, u.username, t.creatorid FROM user u INNER JOIN team t ON u.userid=t.userid AND t.creatorid=${req.userid}`,
+    con.query(`SELECT u.*, t.creatorid FROM user u INNER JOIN team t ON u.userid=t.userid AND t.creatorid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -220,7 +230,7 @@ exports.getOwnerTeams = (req, response) => {
 
 exports.getTeamParticipants = (req, response) => {
     if (!req.team) return response.status(500).json({error: 'You are not a team'});
-    con.query(`SELECT u.userid, u.name, u.username, u.image FROM user u INNER JOIN teamparticipants tp ON u.userid=tp.userid AND tp.teamid=${req.userid}`,
+    con.query(`SELECT u.* FROM user u INNER JOIN teamparticipants tp ON u.userid=tp.userid AND tp.teamid=${req.userid} INNER JOIN basicuser bu ON u.userid=bu.userid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -228,7 +238,8 @@ exports.getTeamParticipants = (req, response) => {
 }
 
 exports.getPlayingTeams = (req, response) => {
-    con.query(`SELECT u.userid, u.name, u.image, u.team, u.publicprofile, u.username, t.creatorid FROM user u INNER JOIN team t ON u.userid=t.userid INNER JOIN teamparticipants tp ON t.teamid=tp.teamid AND tp.userid=${req.userid}`,
+    if (req.team) return response.status(500).json({error: 'You are a team'});
+    con.query(`SELECT u.*, t.creatorid FROM user u INNER JOIN team t ON u.userid=t.userid INNER JOIN teamparticipants tp ON t.teamid=tp.teamid AND tp.userid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -236,27 +247,24 @@ exports.getPlayingTeams = (req, response) => {
 }
 
 exports.createTeam = (req, response) => {
-    encrypt.encryptPassword(req.body.password,
-    (error, hash) => {
-        if (error) return response.status(500).json({error: error.message});
-        con.query(`INSERT INTO user (username, name, password, team) VALUES ('${req.body.username}', '${req.body.name}', '${hash}', 1)`,
-        (err, res) => {
-            if (err) return response.status(500).json({error: err.message});
-            let userid = res.insertId;
-            con.query(`INSERT INTO team (userid, creatorid) VALUES (${userid}, ${req.userid})`,
-            (err2, res2) => {
-                if (err2) return response.status(500).json({error: err2.message});
-                con.query(`INSERT INTO teamparticipants (teamid, userid) VALUES (${res2.insertId}, ${req.userid})`,
-                (err3, res3) => {
-                    if (err3) return response.status(500).json({error: err3.message});
-                    return response.sendStatus(200);
-                });
+    if (req.team) return response.status(500).json({error: 'You are a team'});
+    con.query(`INSERT INTO user (name, team) VALUES ('${req.body.name}', 1)`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        con.query(`INSERT INTO team (userid, creatorid) VALUES (${res.insertId}, ${req.userid})`,
+        (err2, res2) => {
+            if (err2) return response.status(500).json({error: err2.message});
+            con.query(`INSERT INTO teamparticipants (teamid, userid) VALUES (${res2.insertId}, ${req.userid})`,
+            (err3, res3) => {
+                if (err3) return response.status(500).json({error: err3.message});
+                return response.sendStatus(200);
             });
         });
-    })
+    });
 }
 
 exports.leaveTeam = (req, response) => {
+    if (req.team) return response.status(500).json({error: 'You are a team'});
     con.query(`DELETE FROM teamparticipants WHERE teamid=${req.body.teamid} AND userid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
@@ -265,6 +273,7 @@ exports.leaveTeam = (req, response) => {
 }
 
 exports.getTeamInvitations = (req, response) => {
+    if (req.team) return response.status(500).json({error: 'You are a team'});
     con.query(`SELECT * FROM teaminvitations WHERE userid=${req.userid}`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
@@ -282,6 +291,7 @@ exports.inviteToTeam = (req, response) => {
 }
 
 exports.acceptTeamInvitation = (req, response) => {
+    if (req.team) return response.status(500).json({error: 'You are a team'});
     con.query(`CALL ACCEPT_TEAM_INVITATION(${req.params.teamid}, ${req.userid})`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});

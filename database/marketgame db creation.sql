@@ -36,15 +36,11 @@ CREATE UNIQUE INDEX `gameid_UNIQUE` ON `marketgame`.`game` (`gameid` ASC) VISIBL
 CREATE TABLE IF NOT EXISTS `marketgame`.`user` (
   `userid` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(60) NOT NULL,
   `image` VARCHAR(45) NULL,
   `team` TINYINT(1) NOT NULL DEFAULT 0,
   `publicprofile` TINYINT(1) NOT NULL DEFAULT 0,
-  `username` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`userid`, `username`))
+  PRIMARY KEY (`userid`))
 ENGINE = InnoDB;
-
-CREATE UNIQUE INDEX `username_UNIQUE` ON `marketgame`.`user` (`username` ASC) VISIBLE;
 
 CREATE UNIQUE INDEX `userid_UNIQUE` ON `marketgame`.`user` (`userid` ASC) VISIBLE;
 
@@ -57,6 +53,9 @@ CREATE TABLE IF NOT EXISTS `marketgame`.`basicUser` (
   `email` VARCHAR(45) NOT NULL,
   `dni` INT NOT NULL,
   `admin` TINYINT(1) NOT NULL DEFAULT 0,
+  `password` VARCHAR(60) NOT NULL,
+  `username` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`username`),
   CONSTRAINT `bUser_user_idx`
     FOREIGN KEY (`userid`)
     REFERENCES `marketgame`.`user` (`userid`)
@@ -403,6 +402,7 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
+DROP TRIGGER IF EXISTS UPDATE_CASH;
 DELIMITER $$
 CREATE TRIGGER UPDATE_CASH
 	AFTER INSERT ON transaction
@@ -492,6 +492,7 @@ CREATE TRIGGER UPDATE_CASH
 	END; 
 $$ DELIMITER ;
 
+DROP TRIGGER IF EXISTS UPDATE_CURRENCY_CASH;
 DELIMITER $$
 CREATE TRIGGER UPDATE_CURRENCY_CASH
 	AFTER INSERT ON currencytransaction
@@ -508,7 +509,7 @@ CREATE TRIGGER UPDATE_CURRENCY_CASH
         
         IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
 			IF actualinstance IS NOT NULL THEN
-				IF NEW.currencycode IN (SELECT code FROM currency c INNER JOIN currencyingame cg ON c.code=cg.sharecode AND cg.gameid=NEW.gameid) THEN
+				IF NEW.currencycode IN (SELECT code FROM currency c INNER JOIN currencyingame cg ON c.code=cg.currencycode AND cg.gameid=NEW.gameid) THEN
 					IF NEW.currencycode != 'ARS' THEN
 						IF NEW.action='buy' THEN
 							IF actualcash >= (NEW.quotation * NEW.amount) THEN
@@ -588,14 +589,15 @@ BEGIN
 END $$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS CREATE_TEAM_INVITATION;
 DELIMITER $$
 CREATE PROCEDURE CREATE_TEAM_INVITATION(IN invteamuserid INT, IN invusername VARCHAR(45))
 BEGIN
 	DECLARE invuserid INT;
     DECLARE invteamid INT;
-    SET invuserid=(SELECT userid FROM user WHERE username=invusername);
+    SET invuserid=(SELECT userid FROM basicuser WHERE username=invusername);
     SET invteamid=(SELECT teamid FROM team WHERE userid=invteamuserid);
-    IF (SELECT team FROM user WHERE username=invusername)=0 THEN
+    IF (SELECT team FROM user WHERE userid=invuserid)=0 THEN
 		IF (SELECT team FROM user WHERE userid=invteamuserid)=1 AND invteamid IS NOT NULL THEN
 			IF (SELECT userid FROM teaminvitations WHERE userid=invuserid AND teamid=invteamid) IS NULL THEN
 				IF (SELECT userid FROM teamparticipants WHERE userid=invuserid AND teamid=invteamid) IS NULL THEN
@@ -619,6 +621,7 @@ BEGIN
 END $$
 DELIMITER ;
 
+DROP PROCEDURE IF EXISTS ACCEPT_TEAM_INVITATION;
 DELIMITER $$
 CREATE PROCEDURE ACCEPT_TEAM_INVITATION(IN invteamid INT, IN invuserid INT)
 BEGIN

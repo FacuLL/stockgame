@@ -32,6 +32,7 @@ router.delete('/admin/user/:userid/makeadmin', userCtrl.checkToken, adminCtrl.ch
 router.get('/admin/users', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getUsers);
 router.get('/admin/user/:userid', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getUser);
 router.get('/admin/teams', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getTeams);
+router.get('/admin/team/:teamid', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getTeam);
 router.get('/admin/user/:userid/wins', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getUserWins);
 router.get('/admin/game/:gameid/winners', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getUsers);
 router.post('/admin/games', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.createGame);

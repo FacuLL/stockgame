@@ -251,15 +251,15 @@ BEGIN
 END $$
 DELIMITER ;
 
-DROP PROCEDURE CREATE_TEAM_INVITATION;
+DROP PROCEDURE IF EXISTS CREATE_TEAM_INVITATION;
 DELIMITER $$
 CREATE PROCEDURE CREATE_TEAM_INVITATION(IN invteamuserid INT, IN invusername VARCHAR(45))
 BEGIN
 	DECLARE invuserid INT;
     DECLARE invteamid INT;
-    SET invuserid=(SELECT userid FROM user WHERE username=invusername);
+    SET invuserid=(SELECT userid FROM basicuser WHERE username=invusername);
     SET invteamid=(SELECT teamid FROM team WHERE userid=invteamuserid);
-    IF (SELECT team FROM user WHERE username=invusername)=0 THEN
+    IF (SELECT team FROM user WHERE userid=invuserid)=0 THEN
 		IF (SELECT team FROM user WHERE userid=invteamuserid)=1 AND invteamid IS NOT NULL THEN
 			IF (SELECT userid FROM teaminvitations WHERE userid=invuserid AND teamid=invteamid) IS NULL THEN
 				IF (SELECT userid FROM teamparticipants WHERE userid=invuserid AND teamid=invteamid) IS NULL THEN
@@ -283,7 +283,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-DROP PROCEDURE ACCEPT_TEAM_INVITATION;
+DROP PROCEDURE IF EXISTS ACCEPT_TEAM_INVITATION;
 DELIMITER $$
 CREATE PROCEDURE ACCEPT_TEAM_INVITATION(IN invteamid INT, IN invuserid INT)
 BEGIN
@@ -322,4 +322,6 @@ SELECT s.* FROM share s INNER JOIN shareingame sg ON s.code=sg.sharecode AND sg.
 
 INSERT INTO teaminvitations (teamid, userid) VALUES (1, (SELECT userid ));
 
-SELECT u.userid, u.name, u.username, u.image FROM user u INNER JOIN teamparticipants tp ON u.userid=tp.userid AND tp.teamid=3
+SELECT u.userid, u.name, u.username, u.image FROM user u INNER JOIN teamparticipants tp ON u.userid=tp.userid AND tp.teamid=3;
+
+SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, t.creatorid, bu.username FROM user u LEFT JOIN team t ON u.userid=t.userid LEFT JOIN basicuser bu ON u.userid=bu.userid) b WHERE userid=1 AND publicprofile=1;
