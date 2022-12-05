@@ -107,6 +107,8 @@ CREATE TABLE IF NOT EXISTS `marketgame`.`share` (
   `automatized` TINYINT(1) NOT NULL DEFAULT 1,
   `currency` VARCHAR(3) NOT NULL DEFAULT 'ars',
   `image` VARCHAR(45) NULL,
+  `available` TINYINT(1) NOT NULL,
+  `endpoint` VARCHAR(60) NULL,
   PRIMARY KEY (`code`))
 ENGINE = InnoDB;
 
@@ -141,9 +143,12 @@ CREATE INDEX `share_game_gameid_idx` ON `marketgame`.`shareInGame` (`gameid` ASC
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `marketgame`.`currency` (
   `code` VARCHAR(4) NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
   `quotation` DECIMAL(9,2) NOT NULL DEFAULT 0,
   `image` VARCHAR(45) NULL,
   `automatized` TINYINT(1) NOT NULL DEFAULT '1',
+  `available` TINYINT(1) NOT NULL,
+  `endpoint` VARCHAR(60) NULL,
   PRIMARY KEY (`code`))
 ENGINE = InnoDB;
 
@@ -261,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `marketgame`.`teamParticipants` (
     ON UPDATE NO ACTION,
   CONSTRAINT `t_part_user`
     FOREIGN KEY (`userid`)
-    REFERENCES `marketgame`.`user` (`userid`)
+    REFERENCES `marketgame`.`basicUser` (`userid`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -396,6 +401,139 @@ CREATE TABLE IF NOT EXISTS `marketgame`.`historicalShare` (
 ENGINE = InnoDB;
 
 CREATE INDEX `hisshare_share_idx` ON `marketgame`.`historicalShare` (`sharecode` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`historicalCurrency`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`historicalCurrency` (
+  `currencycode` VARCHAR(4) NOT NULL,
+  `date` DATETIME NOT NULL,
+  `quotation` DECIMAL(9,2) NOT NULL,
+  CONSTRAINT `hiscurr_curr`
+    FOREIGN KEY (`currencycode`)
+    REFERENCES `marketgame`.`currency` (`code`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `hiscurr_curr_idx` ON `marketgame`.`historicalCurrency` (`currencycode` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`commodity`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`commodity` (
+  `commodityid` INT NOT NULL,
+  `quotation` DECIMAL(9,2) NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `image` VARCHAR(45) NULL,
+  `automatized` TINYINT(1) NOT NULL,
+  `available` TINYINT(1) NOT NULL,
+  `endpoint` VARCHAR(45) NULL,
+  PRIMARY KEY (`commodityid`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`commodityInGame`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`commodityInGame` (
+  `commodityid` INT NOT NULL,
+  `gameid` INT NOT NULL,
+  CONSTRAINT `com_game_com`
+    FOREIGN KEY (`commodityid`)
+    REFERENCES `marketgame`.`commodity` (`commodityid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `com_game_game`
+    FOREIGN KEY (`gameid`)
+    REFERENCES `marketgame`.`game` (`gameid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `com_game_com_idx` ON `marketgame`.`commodityInGame` (`commodityid` ASC) VISIBLE;
+
+CREATE INDEX `com_game_game_idx` ON `marketgame`.`commodityInGame` (`gameid` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`commodityTransaction`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`commodityTransaction` (
+  `comtransid` INT NOT NULL,
+  `userid` INT NOT NULL,
+  `gameid` INT NOT NULL,
+  `date` DATETIME NOT NULL,
+  `quotation` DECIMAL(9,2) NOT NULL,
+  `action` VARCHAR(4) NOT NULL,
+  `commodityid` INT NOT NULL,
+  `amount` INT NOT NULL,
+  PRIMARY KEY (`comtransid`),
+  CONSTRAINT `comtrans_userid`
+    FOREIGN KEY (`userid`)
+    REFERENCES `marketgame`.`user` (`userid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `comtrans_gameid`
+    FOREIGN KEY (`gameid`)
+    REFERENCES `marketgame`.`game` (`gameid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `comtrans_comid`
+    FOREIGN KEY (`commodityid`)
+    REFERENCES `marketgame`.`commodityInGame` (`commodityid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `comtrans_userid_idx` ON `marketgame`.`commodityTransaction` (`userid` ASC) VISIBLE;
+
+CREATE INDEX `comtrans_gameid_idx` ON `marketgame`.`commodityTransaction` (`gameid` ASC) VISIBLE;
+
+CREATE INDEX `comtrans_comid_idx` ON `marketgame`.`commodityTransaction` (`commodityid` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`commodityStock`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`commodityStock` (
+  `instanceid` INT NOT NULL,
+  `commodityid` INT NOT NULL,
+  `stock` INT NOT NULL,
+  CONSTRAINT `comstock_instance`
+    FOREIGN KEY (`instanceid`)
+    REFERENCES `marketgame`.`gameParticipants` (`instanceid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `comstock_com`
+    FOREIGN KEY (`commodityid`)
+    REFERENCES `marketgame`.`commodityInGame` (`commodityid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `comstock_instance_idx` ON `marketgame`.`commodityStock` (`instanceid` ASC) VISIBLE;
+
+CREATE INDEX `comstock_com_idx` ON `marketgame`.`commodityStock` (`commodityid` ASC) VISIBLE;
+
+
+-- -----------------------------------------------------
+-- Table `marketgame`.`historicalCommodity`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `marketgame`.`historicalCommodity` (
+  `commodityid` INT NOT NULL,
+  `date` DATETIME NOT NULL,
+  `quotation` DECIMAL(9,2) NOT NULL,
+  CONSTRAINT `hiscom_com`
+    FOREIGN KEY (`commodityid`)
+    REFERENCES `marketgame`.`commodity` (`commodityid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE INDEX `hiscom_com_idx` ON `marketgame`.`historicalCommodity` (`commodityid` ASC) VISIBLE;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
@@ -554,6 +692,63 @@ CREATE TRIGGER UPDATE_CURRENCY_CASH
 	END; 
 $$ DELIMITER ;
 
+DROP TRIGGER IF EXISTS UPDATE_COMMODITIY_CASH;
+DELIMITER $$
+CREATE TRIGGER UPDATE_COMMODITIY_CASH
+	AFTER INSERT ON commoditytransaction
+	FOR EACH ROW
+	BEGIN
+		DECLARE actualinstance INT;
+        DECLARE actualcash DECIMAL(9,2);
+        DECLARE actualamount INT;
+        DECLARE actualstockcommodity DECIMAL(9,2);
+        
+        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualcash = (SELECT cash FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualamount = (SELECT stock FROM commoditystock WHERE instanceid=actualinstance AND commodityid=NEW.commodityid);
+        
+        IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
+			IF actualinstance IS NOT NULL THEN
+				IF NEW.commodityid IN (SELECT commodityid FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=NEW.gameid) THEN
+					IF NEW.action='buy' THEN
+						IF actualcash >= (NEW.quotation * NEW.amount) THEN
+							UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							IF actualamount IS NULL THEN
+								INSERT INTO commoditystock (instanceid, commodityid, stock) VALUES (actualinstance, NEW.commodityid, NEW.amount);
+							ELSE
+								UPDATE commoditystock SET stock=(actualamount + NEW.amount) WHERE instanceid=actualinstance AND commodityid=NEW.commodityid;
+							END IF;
+						ELSE
+							SIGNAL SQLSTATE '45000'
+							SET MESSAGE_TEXT = "Not enough cash to buy";
+						END IF;
+					ELSEIF NEW.action='sell' THEN
+						IF actualamount IS NOT NULL AND actualamount >= NEW.amount THEN
+							UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							UPDATE commoditystock SET stock=(actualamount - NEW.amount) WHERE instanceid=actualinstance AND commodityid=NEW.commodityid;
+						ELSE
+							SIGNAL SQLSTATE '45000'
+							SET MESSAGE_TEXT = "Not enough stock to sell";
+						END IF;
+					ELSE
+						SIGNAL SQLSTATE '45000'
+						SET MESSAGE_TEXT = "Invalid action";
+					END IF;
+				ELSE
+					SIGNAL SQLSTATE '45000'
+					SET MESSAGE_TEXT = "Currency is not in this game";
+				END IF;
+			ELSE
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = "User not in game";
+			END IF;
+		ELSE
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = "The game has already finished";
+		END IF;
+	END; 
+$$ DELIMITER ;
+
 CREATE VIEW VARIATIONS AS SELECT gp.gameid, gp.userid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
 
 DELIMITER $$
@@ -579,13 +774,25 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE DELETE_USER(IN deluserid INT)
 BEGIN
+	DECLARE delteamid INT;
 	IF (SELECT team FROM user WHERE userid=deluserid) = 1 THEN
+		SET delteamid = (SELECT teamid WHERE userid=deluserid);
+        DELETE FROM teamparticipants WHERE teamid=delteamid;
+        DELETE FROM teaminvitations WHERE teamid=delteamid;
 		DELETE FROM team WHERE userid=deluserid;
-        DELETE FROM user WHERE userid=deluserid;
     ELSE
+		DELETE FROM teamparticipants WHERE userid=deluserid;
+        DELETE FROM teaminvitations WHERE userid=deluserid;
 		DELETE FROM basicuser WHERE userid=deluserid;
-        DELETE FROM user WHERE userid=deluserid;
     END IF;
+    DELETE FROM transaction WHERE userid=deluserid;
+    DELETE FROM currencytransaction WHERE userid=deluserid;
+    DELETE FROM commoditytransaction WHERE userid=deluserid;
+    DELETE FROM sharestock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM currencystock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM commoditystock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM gameparticipants WHERE userid=deluserid;
+    DELETE FROM user WHERE userid=deluserid;
 END $$
 DELIMITER ;
 

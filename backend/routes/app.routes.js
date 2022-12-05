@@ -45,7 +45,16 @@ router.get('/admin/game/:gameid/transactions', userCtrl.checkToken, adminCtrl.ch
 router.get('/admin/game/:gameid/currencytransactions', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getGameCurrencyTransactions);
 router.get('/admin/users', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getUsers);
 router.get('/admin/shares', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getShares);
+router.post('/admin/shares', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.createShare);
 router.get('/admin/share/:sharecode', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getShare);
 router.get('/admin/game/:gameid/shares', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getGameShares);
+router.get('/admin/currencies', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getCurrencies);
+router.post('/admin/currencies', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.createCurrency);
+router.get('/admin/currency/:currencycode', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getCurrency);
+router.get('/admin/game/:gameid/currencies', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getGameCurrencies);
+router.get('/admin/commodities', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getCommodities);
+router.post('/admin/commodities', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.createCommodity);
+router.get('/admin/commodity/:commoditycode', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getCommodity);
+router.get('/admin/game/:gameid/commodities', userCtrl.checkToken, adminCtrl.checkAdmin, adminCtrl.getGameCommodities);
 
 module.exports = router;

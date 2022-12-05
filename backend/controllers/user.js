@@ -2,7 +2,6 @@ var con = require('../database');
 var encrypt = require('../encrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const { json } = require('body-parser');
 
 var exports = module.exports = {};
 

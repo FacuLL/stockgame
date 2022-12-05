@@ -216,6 +216,63 @@ CREATE TRIGGER UPDATE_CURRENCY_CASH
 	END; 
 $$ DELIMITER ;
 
+DROP TRIGGER IF EXISTS UPDATE_COMMODITIY_CASH;
+DELIMITER $$
+CREATE TRIGGER UPDATE_COMMODITIY_CASH
+	AFTER INSERT ON commoditytransaction
+	FOR EACH ROW
+	BEGIN
+		DECLARE actualinstance INT;
+        DECLARE actualcash DECIMAL(9,2);
+        DECLARE actualamount INT;
+        DECLARE actualstockcommodity DECIMAL(9,2);
+        
+        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualcash = (SELECT cash FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualamount = (SELECT stock FROM commoditystock WHERE instanceid=actualinstance AND commodityid=NEW.commodityid);
+        
+        IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
+			IF actualinstance IS NOT NULL THEN
+				IF NEW.commodityid IN (SELECT commodityid FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=NEW.gameid) THEN
+					IF NEW.action='buy' THEN
+						IF actualcash >= (NEW.quotation * NEW.amount) THEN
+							UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							IF actualamount IS NULL THEN
+								INSERT INTO commoditystock (instanceid, commodityid, stock) VALUES (actualinstance, NEW.commodityid, NEW.amount);
+							ELSE
+								UPDATE commoditystock SET stock=(actualamount + NEW.amount) WHERE instanceid=actualinstance AND commodityid=NEW.commodityid;
+							END IF;
+						ELSE
+							SIGNAL SQLSTATE '45000'
+							SET MESSAGE_TEXT = "Not enough cash to buy";
+						END IF;
+					ELSEIF NEW.action='sell' THEN
+						IF actualamount IS NOT NULL AND actualamount >= NEW.amount THEN
+							UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							UPDATE commoditystock SET stock=(actualamount - NEW.amount) WHERE instanceid=actualinstance AND commodityid=NEW.commodityid;
+						ELSE
+							SIGNAL SQLSTATE '45000'
+							SET MESSAGE_TEXT = "Not enough stock to sell";
+						END IF;
+					ELSE
+						SIGNAL SQLSTATE '45000'
+						SET MESSAGE_TEXT = "Invalid action";
+					END IF;
+				ELSE
+					SIGNAL SQLSTATE '45000'
+					SET MESSAGE_TEXT = "Currency is not in this game";
+				END IF;
+			ELSE
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = "User not in game";
+			END IF;
+		ELSE
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = "The game has already finished";
+		END IF;
+	END; 
+$$ DELIMITER ;
+
 CREATE VIEW VARIATIONS AS SELECT gp.gameid, gp.userid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
 
 DELIMITER $$
@@ -241,13 +298,25 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE DELETE_USER(IN deluserid INT)
 BEGIN
+	DECLARE delteamid INT;
 	IF (SELECT team FROM user WHERE userid=deluserid) = 1 THEN
+		SET delteamid = (SELECT teamid WHERE userid=deluserid);
+        DELETE FROM teamparticipants WHERE teamid=delteamid;
+        DELETE FROM teaminvitations WHERE teamid=delteamid;
 		DELETE FROM team WHERE userid=deluserid;
-        DELETE FROM user WHERE userid=deluserid;
     ELSE
+		DELETE FROM teamparticipants WHERE userid=deluserid;
+        DELETE FROM teaminvitations WHERE userid=deluserid;
 		DELETE FROM basicuser WHERE userid=deluserid;
-        DELETE FROM user WHERE userid=deluserid;
     END IF;
+    DELETE FROM transaction WHERE userid=deluserid;
+    DELETE FROM currencytransaction WHERE userid=deluserid;
+    DELETE FROM commoditytransaction WHERE userid=deluserid;
+    DELETE FROM sharestock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM currencystock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM commoditystock WHERE instanceid IN (SELECT instaneid FROM gameparticipants WHERE userid=deluserid);
+    DELETE FROM gameparticipants WHERE userid=deluserid;
+    DELETE FROM user WHERE userid=deluserid;
 END $$
 DELIMITER ;
 
