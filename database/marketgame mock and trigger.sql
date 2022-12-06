@@ -33,7 +33,7 @@ INSERT INTO share (code, name, quotation, currency) VALUES ('YPF', 'YPF ARG', 20
 
 INSERT INTO shareingame (gameid, sharecode) VALUES (2, 'YPF');
 
-INSERT INTO currency (code, quotation) VALUES ('ARS', 1);
+INSERT INTO currency (code, name, quotation, available) VALUES ('ARS',"Pesos Argentinos", 1, 1);
 INSERT INTO currency (code, quotation) VALUES ('USD', 300);
 
 INSERT INTO currencyingame (currencycode, gameid) VALUES ('ARS', 1);

@@ -184,36 +184,34 @@ exports.createShare = (req, response) => {
 }
 
 exports.createCurrency = (req, response) => {
-    if (req.body.code=="USD") createUSD(req, response);
-    else {
-        yahooFinance.quote({symbol: req.body.code + "ARS=X", modules: [ 'price' ]}, 
-        (error, quotes) => {
-            if (error && (!!req.body.automatized)) return response.status(500).json({error: err.message});
-            con.query(`INSERT INTO currency (code, name, automatized, quotation, available) VALUES (
-                '${req.body.code}', 
-                '${req.body.name}', 
-                ${req.body.automatized},
-                ${!!req.body.automatized ? quotes.price.regularMarketPrice : req.body.quotation}, 1)`,
-            (err, res) => {
-                if (err) return response.status(500).json({error: err.message});
-                if (!(!!req.body.automatized)) return response.sendStatus(200);
-                yahooFinance.historical({symbol: req.body.code + "ARS=X", from: '2019-01-01'}, 
-                (quoteerr, quotes) => {
-                    if (quoteerr) return response.status(500).json({error: quoteerr.message});
-                    let query = "INSERT INTO historicalcurrency (currencycode, date, quotation) VALUES ";
-                    quotes.forEach(quote => {
-                        query+=`('${req.body.code}', '${stringifyDate(quote.date)}', ${quote.close}),`
-                    });
-                    query = query.slice(0, -1);
-                    con.query(query,
-                    (err2, res2) => {
-                        if (err2) return response.status(500).json({error: err2.message});
-                        return response.sendStatus(200);
-                    });
+    if (req.body.code=="USD") return createUSD(req, response);
+    yahooFinance.quote({symbol: req.body.code + "ARS=X", modules: [ 'price' ]}, 
+    (error, quotes) => {
+        if (error && (!!req.body.automatized)) return response.status(500).json({error: err.message});
+        con.query(`INSERT INTO currency (code, name, automatized, quotation, available) VALUES (
+            '${req.body.code}', 
+            '${req.body.name}', 
+            ${req.body.automatized},
+            ${!!req.body.automatized ? quotes.price.regularMarketPrice : req.body.quotation}, 1)`,
+        (err, res) => {
+            if (err) return response.status(500).json({error: err.message});
+            if (!(!!req.body.automatized)) return response.sendStatus(200);
+            yahooFinance.historical({symbol: req.body.code + "ARS=X", from: '2019-01-01'}, 
+            (quoteerr, quotes) => {
+                if (quoteerr) return response.status(500).json({error: quoteerr.message});
+                let query = "INSERT INTO historicalcurrency (currencycode, date, quotation) VALUES ";
+                quotes.forEach(quote => {
+                    query+=`('${req.body.code}', '${stringifyDate(quote.date)}', ${quote.close}),`
+                });
+                query = query.slice(0, -1);
+                con.query(query,
+                (err2, res2) => {
+                    if (err2) return response.status(500).json({error: err2.message});
+                    return response.sendStatus(200);
                 });
             });
         });
-    }
+    });
 }
 
 function createUSD(req, response) {
