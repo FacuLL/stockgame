@@ -1,0 +1,25 @@
+<div class="container align">
+    <div class="grid">
+        <form #f="ngForm" (ngSubmit)="login(f)" class="form login">
+            <h1 class="text--center">Iniciar sesion</h1>
+            <div class="form__field">
+                <label for="login__username"><svg class="icon grayicon">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use>
+                    </svg></label>
+                <input id="login__username" type="text" name="username" class="form__input" placeholder="Nombre de usuario" autocomplete="off"
+                    required="" ngModel>
+            </div>
+            <div class="form__field">
+                <label for="login__password"><svg class="icon grayicon">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"></use>
+                    </svg></label>
+                <input id="login__password" type="password" name="password" class="form__input" placeholder="Contraseña"
+                    required="" ngModel>
+            </div>
+            <div class="form__field">
+                <input type="submit" value="Entrar">
+            </div>
+        </form>
+        <p class="text--center mt-n3">Olvidaste tu contraseña? <a href="forgottenpass">Recuperala</a></p>
+    </div>
+</div>

@@ -4,6 +4,7 @@ const userCtrl = require('../controllers/user');
 const adminCtrl = require('../controllers/admin');
 
 router.post('/login', userCtrl.login);
+router.get('/verifyToken', userCtrl.checkToken, userCtrl.verifyToken)
 router.get('/games', userCtrl.checkToken, userCtrl.getPlayingGames);
 router.get('/game/:gameid', userCtrl.checkToken, userCtrl.getGame);
 router.get('/games/position', userCtrl.checkToken, userCtrl.getPosInGames);

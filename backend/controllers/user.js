@@ -33,11 +33,15 @@ exports.checkToken = (req, response, next) => {
     });
 }
 
+exports.verifyToken = (req, response) => {
+    return response.status(200).json({message: 'Correct token'});
+}
+
 exports.login = (req, response) => {
     con.query(`SELECT * FROM basicuser WHERE username='${req.body.username}'`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
-        if (res.length <= 0) return response.sendStatus(403).json({error: "Username or password invalid"});
+        if (res.length <= 0) return response.status(403).json({error: "Username or password invalid"});
         encrypt.comparePassword(req.body.password, res[0].password,
         (error, match) => {
             if (error) return response.status(500).json({error: error.message});

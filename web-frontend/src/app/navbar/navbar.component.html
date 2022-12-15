@@ -1,0 +1,25 @@
+<div class="navbar">
+    <div class="logotitle">
+        <div class="logo">
+            <img src="assets/logo.png" alt="logo eata" class="img-logo">
+        </div>
+        <h1 class="title">Marketgame</h1>
+    </div>
+    <div class="buttonsdiv">
+        <div class="sections">
+            <button class="sectionbt games" [routerLink]="['/games']" routerLinkActive="router-link-active" >Mis juegos</button>
+            <button class="sectionbt about">Acerca de</button>
+        </div>
+        <div class="login">
+            <button class="loginbt" [routerLink]="['/login']">
+                <svg class="icon whiteicon loginicon">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#user"></use>
+                </svg>
+                Iniciar Sesion
+            </button>
+        </div>
+        <div class="user">
+
+        </div>
+    </div>
+</div>

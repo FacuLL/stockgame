@@ -1,0 +1,84 @@
+.navbar {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    justify-content: space-between;
+}
+
+.img-logo {
+    height: 100%;
+}
+
+.logo {
+    height: 100%;
+    width: fit-content;
+}
+
+.logotitle {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    margin-left: 10px;
+    font-family: 'Open Sans', sans-serif;
+    margin-bottom: -2.5px;
+}
+
+.buttonsdiv {
+    display: flex;
+}
+
+.sections {
+    border-right: 1px solid rgb(88, 88, 88);
+    margin-right: 25px;
+    padding-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.sectionbt {
+    margin: 5px 10px;
+    background: none;
+    border: 0;
+    font-family: Inter, sans-serif;
+    font-size: medium;
+}
+
+.login {
+    display: flex;
+    align-items: center;
+}
+
+.loginbt {
+    -webkit-box-align: center;
+    align-items: center;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    -webkit-box-pack: center;
+    justify-content: center;
+    line-height: 24px;
+    background-color: rgb(0, 105, 255);
+    border: none;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+    padding: 0px 20px;
+    transition: background-color 250ms ease 0s;
+    width: 100%;
+    will-change: background-color;
+    font-family: Inter, sans-serif;
+    font-size: large;
+}
+
+.loginbt:hover {
+    background-color: rgb(0, 62, 150);
+}
+
+.loginicon {
+    margin-right: 10px;
+    margin-left: -5px;
+}
