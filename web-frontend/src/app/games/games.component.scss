@@ -1,0 +1,159 @@
+.container {
+    padding-top: 20px;
+}
+
+.title {
+    text-align: center;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.game {
+    cursor: pointer;
+    transition: 0.5s;
+    width: 100%;
+    height: 90px;
+    flex-flow: column;
+    transition: height 0.5s, background-color 0.5s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.game p {
+    opacity: 0;
+    margin-top: 5px;
+    transition: opacity 0.5s;
+}
+
+.game:hover p {
+    opacity: 1;
+}
+
+.game .gamestats {
+    opacity: 0;
+    transition: opacity 0.5s, margin-top 0.5s;
+    margin-top: -50px;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+
+.game:hover .gamestats {
+    opacity: 1;
+    margin-top: -10px;
+}
+
+.game .gamestats .selfcashstats {
+    transition: margin-top 0.5s;
+    margin-top: -50px;
+}
+
+.game:hover .gamestats .selfcashstats {
+    margin-top: -15px;
+}
+
+.game .gamestats .variationstats {
+    transition: margin-top 0.5s;
+    margin-top: -50px;
+}
+
+.game:hover .gamestats .variationstats {
+    margin-top: -15px;
+}
+
+.game:hover {
+    height: 200px;
+}
+
+.gamecolor1 {
+    background-color: #4c83ea;
+}
+
+.gamecolor1:hover {
+    background-color: #6893e4;
+}
+
+.gamecolor2 {
+    background-color: #ea934c;
+}
+
+.gamecolor2:hover {
+    background-color: #e2a26e;;
+}
+
+.gamecolor3 {
+    background-color: #3ee9b0;
+}
+
+.gamecolor3:hover {
+    background-color: #72d3b3;
+}
+
+.gamecolor4 {
+    background-color: #701a92;
+}
+
+.gamecolor4:hover {
+    background-color: #743b8a;
+}
+
+.game-date {
+    margin-top: 0;
+}
+
+.game-name {
+    margin: 0;
+    margin-top: 20px;
+    transition: margin-top 0.5s;
+    font-family: 'Inter', sans-serif;
+}
+
+h2 {
+    width: fit-content;
+}
+
+h2.avoid-dark, p.avoid-dark {
+    color: black;
+}
+
+.underline h2 {
+    position: relative;
+}
+
+.underline h2:after {
+    content: '';
+    position: absolute;
+    width: 90%;
+    margin: 0;
+    transform: scaleX(0) translateX(-50%);
+    height: 2px;
+    left: 50%;
+    bottom: 0;
+    background-color:rgb(51, 51, 51);
+    transform-origin: bottom left;
+    transition: transform 0.25s ease-out;
+}
+
+.underline:hover h2:after {
+    transform: scaleX(1) translateX(-50%);
+    transform-origin: bottom left;
+}
+
+.stat {
+    display: flex;
+    flex-flow: row;
+    width: fit-content;
+}
+
+.stat-text {
+    margin-top: 0px;
+    margin-left: 5px;
+    font-size: 17px;
+    font-family: 'Inter', sans-serif;
+}
+
+.staticon {
+    margin-top: 5px;
+}

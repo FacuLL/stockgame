@@ -1,5 +1,5 @@
 body.light {
-    background-color: #f4f4f4;
+    background-color: #eee;
 }
 
 body.light .login input[type='password'],
@@ -27,5 +27,17 @@ body.light a {
 }
 
 body.light .sectionbt {
+    color: black;
+}
+
+body.light .usermenu {
+    background-color: #c0c0c0;
+}
+
+body.light .usermenu::before {
+    background-color: #c0c0c0;
+}
+
+body.light .menubt {
     color: black;
 }

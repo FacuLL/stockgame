@@ -59,7 +59,7 @@ exports.login = (req, response) => {
 }
 
 exports.getPlayingGames = (req, response) => {
-    con.query(`SELECT * FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid}`,
+    con.query(`SELECT * FROM game g INNER JOIN gameparticipants gp LEFT JOIN VARIATIONS v ON g.gameid=gp.gameid AND gp.userid=1 AND g.finished=0 AND v.instanceid=gp.instanceid;`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -67,7 +67,7 @@ exports.getPlayingGames = (req, response) => {
 }
 
 exports.getGame = (req, response) => {
-    con.query(`SELECT g.*, gp.cash, v.variation FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} INNER JOIN VARIATIONS v ON g.gameid=v.gameid AND gp.userid=v.userid`,
+    con.query(`SELECT g.*, gp.cash, v.variation FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} INNER JOIN VARIATIONS v ON gp.instanceid=v.instanceid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);

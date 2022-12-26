@@ -41,6 +41,7 @@ function currencyUpdate() {
         if (err) return console.log(err.message);
         res.forEach(currency => {
             if (currency.code=='USD') USDUpdate(currency.quotation);
+            else if (currency.code=='ARS') {}
             else {
                 yahooFinance.quote({symbol: currency.code + "ARS=X", modules: [ 'price' ]}, 
                 (error, quotes) => {

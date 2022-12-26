@@ -749,7 +749,7 @@ CREATE TRIGGER UPDATE_COMMODITIY_CASH
 	END; 
 $$ DELIMITER ;
 
-CREATE VIEW VARIATIONS AS SELECT gp.gameid, gp.userid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
+CREATE VIEW VARIATIONS AS SELECT gp.instanceid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
 
 DELIMITER $$
 CREATE PROCEDURE GET_USER_WINS(IN winuserid INT)

@@ -40,6 +40,18 @@ exports.deleteUser = (req, response) => {
     });
 }
 
+exports.addGameParticipants = (req, response) => {
+    let query = "INSERT INTO gameparticipants (gameid, userid, cash) VALUES ";
+    for (let i = 0; i < req.body.users.length; i++) {
+        query+=`(${req.params.gameid}, ${req.body.users[i]}, (SELECT initialCash FROM game WHERE gameid=${req.params.gameid}))`;
+    }
+    con.query(query,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        return response.sendStatus(200);
+    });
+}
+
 exports.toggleAdmin = (req, response) => {
     con.query(`UPDATE basicuser SET admin=NOT admin WHERE userid=${req.params.userid};`,
     (err, res) => {
@@ -49,7 +61,7 @@ exports.toggleAdmin = (req, response) => {
 }
 
 exports.getUsers = (req, response) => {
-    con.query(`SELECT u.*, bu.username, bu.email, bu.dni, bu.admin FROM user u INNER JOIN basicuser bu ON u.userid=bu.userid INNER JOIN team ON u.userid=t.userid`,
+    con.query(`SELECT u.*, bu.username, bu.email, bu.dni, bu.admin FROM user u INNER JOIN basicuser bu ON u.userid=bu.userid LEFT JOIN team t ON u.userid=t.userid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);

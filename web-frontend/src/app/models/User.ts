@@ -3,4 +3,14 @@ interface LoginUser {
     password: string
 }
 
-export { LoginUser }
+interface LoggedUser {
+    userid: number
+    name: string
+    image: string
+    team: number
+    publicprofile: number
+    username: string
+    creatorid: number
+}
+
+export { LoginUser, LoggedUser }

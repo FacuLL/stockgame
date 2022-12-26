@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../services/user.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-login',
@@ -9,7 +10,7 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  private err: string = "";
+  public err: string = "";
 
   constructor(private userService: UserService, private router: Router) { }
 
@@ -21,6 +22,7 @@ export class LoginComponent {
     if (this.userService.getToken()) {
       this.userService.verifyToken().subscribe({
         next: res => {
+          this.userService.sessionEvent.emit(true);
           this.router.navigate(['games']);
         },
         error: err => {
@@ -34,13 +36,12 @@ export class LoginComponent {
   login(f: NgForm) {
     this.userService.login(f.value).subscribe({
       next: (res: any) => {
-        console.log(res['token']);
         this.userService.setToken(res['token']);
+        this.userService.sessionEvent.emit(true);
         this.router.navigate(['games']);
       },
       error: err => {
-        this.err = err.error;
-        console.log(err.error);
+        if (err.status == 403) this.err = 'Usuario o contraseña incorrectos';
       }
     })
   }

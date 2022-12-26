@@ -273,7 +273,8 @@ CREATE TRIGGER UPDATE_COMMODITIY_CASH
 	END; 
 $$ DELIMITER ;
 
-CREATE VIEW VARIATIONS AS SELECT gp.gameid, gp.userid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
+DROP VIEW VARIATIONS;
+CREATE VIEW VARIATIONS AS SELECT gp.instanceid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
 
 DELIMITER $$
 CREATE PROCEDURE GET_USER_WINS(IN winuserid INT)
@@ -376,6 +377,18 @@ BEGIN
 		SET MESSAGE_TEXT = "User invited is a team";
 	END IF;
 END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER ADD_PARTICIPANTS
+	AFTER INSERT ON gameparticipants
+    FOR EACH ROW
+    BEGIN
+		IF EXISTS (SELECT * FROM gameparticipants WHERE userid=NEW.userid AND gameid=NEW.gameid) THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = "User already in team";
+		END IF;
+	END  $$
 DELIMITER ;
 
 CALL GET_USER(3);

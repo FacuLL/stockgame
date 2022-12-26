@@ -2,7 +2,7 @@
     height: 10%;
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 5px 15px;
     justify-content: space-between;
 }
 
@@ -11,7 +11,7 @@
 }
 
 .logo {
-    height: 100%;
+    height: 80%;
     width: fit-content;
 }
 
@@ -21,10 +21,18 @@
     align-items: center;
 }
 
+.icon {
+    margin-left: -10px;
+    margin-right: 5px;
+}
+
 .title {
+    margin-top: -5px;
     margin-left: 10px;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Zen Maru Gothic', sans-serif;
     margin-bottom: -2.5px;
+    font-size: 20px;
+    line-height: 19px;
 }
 
 .buttonsdiv {
@@ -63,7 +71,7 @@
     justify-content: center;
     line-height: 24px;
     background-color: rgb(0, 105, 255);
-    border: none;
+    border: 2px solid #eee;
     color: rgb(255, 255, 255);
     font-weight: 600;
     padding: 0px 20px;
@@ -81,4 +89,143 @@
 .loginicon {
     margin-right: 10px;
     margin-left: -5px;
+}
+
+.shape {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.shape svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 20px;
+}
+
+.shape .shape-fill {
+    fill: #4C83EA;
+}
+
+.shapefill {
+    position: absolute;
+    z-index: -1;
+    background-color: #4C83EA;
+    height: 60px;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+}
+
+.user {
+    margin-right: 20px;
+    padding: 1px 5px;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.user:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.profileimage {
+    width: 50px;
+    border-radius: 100%;
+    border: 3px solid #294780;
+    margin-left: 5px;
+}
+
+.usericon {
+    transition: transform 0.5s;
+}
+
+.usericon.turned {
+    transform: rotate(180deg);
+}
+
+.usermenu {
+    visibility: hidden;
+    position: absolute;
+    border-radius: 10px;
+    top: 100px;
+    right: 27px;
+    padding: 10px;
+    opacity: 0;
+    transition: background 0.5s linear, top 0.5s, opacity 0.5s, visibility 0.5s;
+}
+
+.usermenu::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    right: 28px;
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    transition: background 0.5s linear;
+    z-index: 1;
+  }
+
+.usermenu p {
+    margin: 0;
+    z-index: 2;
+}
+
+.usermenu.activemenu {
+    visibility: visible;
+    top: 70px;
+    opacity: 1;
+}
+
+.usermenu-name {
+    font-family: 'Heebo', sans-serif;
+    font-size: 16px;
+    text-align: center;
+}
+
+.usermenu-type {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    text-align: center;
+    margin-top: -5px;
+}
+
+.menubt {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    border: 0;
+    background: rgba(255, 255, 255, 0);
+    transition: background 0.3s;
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 3px;
+}
+
+.menubt:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.menubt-icon {
+    margin-right: 5px;
+}
+
+hr {
+    margin: 5px 0px;
+}
+
+.usermenu-logout {
+    background-color: rgb(214, 62, 62);
+}
+
+.usermenu-logout:hover {
+    background-color: rgb(207, 95, 95);
 }

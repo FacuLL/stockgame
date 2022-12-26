@@ -2,6 +2,9 @@
 @import url('./styles/light.scss');
 
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300&display=swap');
 
 .align {
     -webkit-box-align: center;
@@ -20,24 +23,27 @@
 }
   
 .grid {
-margin-left: auto;
-margin-right: auto;
-max-width: 320px;
-max-width: 20rem;
-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 320px;
+    max-width: 20rem;
+    width: 90%;
 }
 
 .icons {
-display: none;
+    display: none; 
 }
 
-.icon {
-display: inline-block;
-font-size: 16px;
-font-size: 1rem;
-height: 1em;
-vertical-align: middle;
-width: 1em;
+.formicon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: -2px;
+    margin-right: -5px;
+    margin-left: -5px;
+}
+
+.iconlabel {
+    width: fit-content;
 }
 
 .grayicon {
@@ -46,6 +52,10 @@ width: 1em;
 
 .whiteicon {
     fill: #f4f4f4;
+}
+
+.blackicon {
+    fill: black;
 }
 
 .text--center {
@@ -72,8 +82,8 @@ padding: 0;
 -webkit-box-sizing: border-box; 
 -moz-box-sizing: border-box; 
 box-sizing: border-box;
--webkit-transition: background-color 1s linear, color .5s linear;
-transition: background-color 1s linear, color .5s linear;
+-webkit-transition: background-color 1s linear, color 0.1s linear;
+transition: background-color 1s linear, color 0.1s linear;
 }
 
 h1 {
@@ -109,4 +119,4 @@ transition: background-color 0.3s;
 
 input[type='submit'] {
 cursor: pointer;
-}  
+}
