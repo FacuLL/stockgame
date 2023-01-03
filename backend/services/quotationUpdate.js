@@ -6,12 +6,19 @@ var exports = module.exports = {};
 
 dotenv.config();
 
+var interval;
+
 exports.startUpdates = () => {
-    let interval = setInterval(() => {
+    interval = setInterval(() => {
         shareUpdate();
         currencyUpdate();
         commodityUpdate();
-    }, 3600000)
+    }, 3600000);
+    console.log("Quotation update started");
+}
+
+exports.stopUpdates = () => {
+    if (interval) clearInterval(interval);
 }
 
 function shareUpdate() {
@@ -61,7 +68,8 @@ function currencyUpdate() {
 }
 
 function USDUpdate(quotation) {
-    fetch('https://api.estadisticasbcra.com/usd_of', {
+    try {
+        fetch('https://api.estadisticasbcra.com/usd_of', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${process.env.BCRA_BEARER}`,
@@ -78,6 +86,10 @@ function USDUpdate(quotation) {
                 if (err2) return console.log(err2.message);
             });
         });
+    }
+    catch (e) {
+        console.log(e.message);
+    }
 }
 
 function commodityUpdate() {

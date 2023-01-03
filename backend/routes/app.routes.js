@@ -7,9 +7,12 @@ router.post('/login', userCtrl.login);
 router.get('/verifyToken', userCtrl.checkToken, userCtrl.verifyToken)
 router.get('/games', userCtrl.checkToken, userCtrl.getPlayingGames);
 router.get('/game/:gameid', userCtrl.checkToken, userCtrl.getGame);
+router.get('/game/:gameid/full', userCtrl.checkToken, userCtrl.getFullGame);
 router.get('/games/position', userCtrl.checkToken, userCtrl.getPosInGames);
 router.get('/game/:gameid/shares', userCtrl.checkToken, userCtrl.getSharesInGame);
-router.get('/share/:gameid/share/:sharecode/historical', userCtrl.checkToken, userCtrl.getHistoricalShare);
+router.get('/game/:gameid/currencies', userCtrl.checkToken, userCtrl.getCurrenciesInGame);
+router.get('/game/:gameid/commodities', userCtrl.checkToken, userCtrl.getCommoditiesInGame);
+router.get('/game/:gameid/share/:sharecode/full', userCtrl.checkToken, userCtrl.getFullShare);
 router.get('/game/:gameid/shares/stock', userCtrl.checkToken, userCtrl.getSharesStock);
 router.get('/game/:gameid/transactions', userCtrl.checkToken, userCtrl.getTransactions);
 router.post('/game/:gameid/transactions', userCtrl.checkToken, userCtrl.createTransaction);

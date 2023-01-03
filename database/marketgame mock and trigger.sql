@@ -1,5 +1,5 @@
 INSERT INTO game (title, startDate, initialCash) VALUES ('prueba', sysdate(), 100000);
-INSERT INTO game (title, startDate, initialCash) VALUES ('prueba2', sysdate(), 150000);
+INSERT INTO game (title, startDate, initialCash) VALUES ('Prueba 2', sysdate(), 150000);
 INSERT INTO game (title, startDate, initialCash) VALUES ('prueba3', sysdate(), 200000);
 INSERT INTO game (title, startDate, initialCash) VALUES ('prueba4', sysdate(), 50000);
 
@@ -15,9 +15,7 @@ INSERT INTO basicuser (userid, email, dni) VALUES (3, 'CCCC@DDDD.com', 20913821)
 INSERT INTO basicuser (userid, email, dni) VALUES (4, 'EEEEE@prueba123.com', 20913821);
 INSERT INTO basicuser (userid, email, dni) VALUES (5, 'GGGGG@prueba123.com', 20913821);
 
-INSERT INTO gameparticipants (gameid, userid, cash) VALUES (1, 1, (
-	SELECT initialCash FROM game WHERE gameid=1
-));
+INSERT INTO gameparticipants (gameid, userid, cash) VALUES (2, 1, (SELECT initialCash FROM game WHERE gameid=2));
 INSERT INTO gameparticipants (gameid, userid, cash) VALUES (4, 2, (
 	SELECT initialCash FROM game WHERE gameid=4
 ));
@@ -31,22 +29,25 @@ INSERT INTO gameparticipants (gameid, userid, cash) VALUES (3, 5, 1000000);
 
 INSERT INTO share (code, name, quotation, currency) VALUES ('YPF', 'YPF ARG', 2000, 'ARS');
 
-INSERT INTO shareingame (gameid, sharecode) VALUES (2, 'YPF');
+INSERT INTO shareingame (gameid, sharecode) VALUES (2, 'YPFD.BA');
+SELECT * FROM shareingame;
+
 
 INSERT INTO currency (code, name, quotation, available) VALUES ('ARS',"Pesos Argentinos", 1, 1);
 INSERT INTO currency (code, quotation) VALUES ('USD', 300);
 
 INSERT INTO currencyingame (currencycode, gameid) VALUES ('ARS', 1);
 INSERT INTO currencyingame (currencycode, gameid) VALUES ('USD', 1);
+INSERT INTO currencyingame (currencycode, gameid) VALUES ('BRL', 1);
 
 INSERT INTO transaction (userid, gameid, sharecode, date, quotation, action, currencycode, amount) VALUES 
 	(1, 
     1,
-    'YPF', sysdate(), 
-    (SELECT quotation FROM share WHERE code='YPF'),
+    'YPFD.BA', sysdate(), 
+    (SELECT quotation FROM share WHERE code='YPFD.BA'),
     'buy',
-    (SELECT currency FROM share WHERE code='YPF'),
-    10
+    (SELECT currency FROM share WHERE code='YPFD.BA'),
+    3
 );
 
 UPDATE share SET quotation=3000 WHERE code='YPF';
@@ -379,31 +380,26 @@ BEGIN
 END $$
 DELIMITER ;
 
+DROP TRIGGER ADD_PARTICIPANTS;
 DELIMITER $$
 CREATE TRIGGER ADD_PARTICIPANTS
-	AFTER INSERT ON gameparticipants
+	BEFORE INSERT ON gameparticipants
     FOR EACH ROW
     BEGIN
-		IF EXISTS (SELECT * FROM gameparticipants WHERE userid=NEW.userid AND gameid=NEW.gameid) THEN
+		DECLARE instances int;
+        SET instances = (SELECT COUNT(instanceid) FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+		IF instances > 0 THEN
 			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = "User already in team";
+			SET MESSAGE_TEXT = 'User already in game';
 		END IF;
-	END  $$
+	END$$
 DELIMITER ;
 
-CALL GET_USER(3);
-SELECT *, ROW_NUMBER() OVER (ORDER BY variation DESC) AS position FROM VARIATIONS WHERE gameid=4;
+CREATE VIEW USERSTOCK AS SELECT gp.instanceid, COALESCE(ss.stock,0) + COALESCE(cms.stock,0) AS stocks FROM gameparticipants gp LEFT JOIN sharestock ss ON gp.instanceid=ss.instanceid LEFT JOIN commoditystock cms ON gp.instanceid=cms.instanceid;
+CREATE VIEW USERTRANSACTIONS AS SELECT gp.instanceid, COALESCE(COUNT(st.transid), 0) + COALESCE(COUNT(ct.currtransid), 0) + COALESCE(COUNT(cmt.comtransid), 0) AS transactions FROM gameparticipants gp LEFT JOIN transaction st ON gp.gameid=st.gameid AND gp.userid=st.userid LEFT JOIN currencytransaction ct ON gp.gameid=ct.gameid AND gp.userid=ct.userid LEFT JOIN commoditytransaction cmt ON gp.gameid=cmt.gameid AND gp.userid=cmt.userid GROUP BY gp.instanceid;
+CREATE VIEW USERSTATS AS SELECT st.*, ut.transactions FROM USERSTOCK st INNER JOIN USERTRANSACTIONS ut ON st.instanceid=ut.instanceid;
 
-SELECT * FROM user u NATURAL JOIN team t;
-
-SELECT g.* FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=1;
-
-SELECT * FROM VARIATIONS;
-
-SELECT s.* FROM share s INNER JOIN shareingame sg ON s.code=sg.sharecode AND sg.gameid=2 INNER JOIN gameparticipants gp ON gp.gameid=sg.gameid AND gp.userid=1;
-
-INSERT INTO teaminvitations (teamid, userid) VALUES (1, (SELECT userid ));
-
-SELECT u.userid, u.name, u.username, u.image FROM user u INNER JOIN teamparticipants tp ON u.userid=tp.userid AND tp.teamid=3;
-
-SELECT * FROM (SELECT u.userid, u.name, u.image, u.team, u.publicprofile, t.creatorid, bu.username FROM user u LEFT JOIN team t ON u.userid=t.userid LEFT JOIN basicuser bu ON u.userid=bu.userid) b WHERE userid=1 AND publicprofile=1;
+DROP VIEW SHARE_STATS;
+DROP VIEW CURRENCY_STATS;
+CREATE VIEW SHARE_STATS AS SELECT s.*, hs.quotation as lastquote, (hs.quotation * 100 / s.quotation) - 100 AS variation FROM share s LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sharecode ORDER BY date DESC) AS n FROM historicalshare) AS hs2 WHERE n=1) AS hs ON s.code=hs.sharecode;
+CREATE VIEW CURRENCY_STATS AS SELECT c.*, hc.quotation as lastquote, (hc.quotation * 100 / c.quotation) - 100 AS variation FROM currency c LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY currencycode ORDER BY date DESC) AS n FROM historicalcurrency) AS hc2 WHERE n=1) AS hc ON c.code=hc.currencycode;

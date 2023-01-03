@@ -1,0 +1,29 @@
+<div class="gamemenu" [ngClass]="loaded ? 'loaded' : ''">
+    <div class="menu" [ngClass]="gamemenu ? 'opened' : ''" *ngIf="game">
+        <div class="selector">
+            <div class="menuselector" (click)="toggleGameMenu()">
+                <i-tabler name="menu-2" class="menuicon" [ngClass]="gamemenu ? '' : 'active'"></i-tabler>
+                <i-tabler name="x" class="menuicon" [ngClass]="gamemenu ? 'active' : ''"></i-tabler>
+            </div>
+        </div>
+        <p class="gametitle"><b>{{ game.title }}</b></p>
+        <p class="gametitlemenu">Menu del juego</p>
+        <hr class="gamehr">
+        <button class="menubt home" [routerLink]="['/game/' + game.gameid]" routerLinkActive="router-link-active" >
+            <i-tabler name="home" class="menubt-icon"></i-tabler>
+            Inicio
+        </button>
+        <button class="menubt inventory" [routerLink]="['/game/' + game.gameid + '/inventory']">
+            <i-tabler name="archive" class="menubt-icon"></i-tabler>
+            Mi inventario
+        </button>
+        <button class="menubt transactions" [routerLink]="['/game/' + game.gameid + '/transactions']">
+            <i-tabler name="arrows-exchange-2" class="menubt-icon"></i-tabler>
+            Mis transacciones
+        </button>
+        <button class="menubt goback" [routerLink]="['/games']">
+            <i-tabler name="arrow-back" class="menubt-icon"></i-tabler>
+            Volver a juegos
+        </button>
+    </div>
+</div>

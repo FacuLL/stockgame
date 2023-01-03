@@ -15,11 +15,21 @@ export class UserService {
   @Output() sessionEvent: EventEmitter<boolean> = new EventEmitter();
 
   setToken(token: string) {
-    this.cookies.set("token", token);
+    if (this.cookies.get("token")) this.cookies.delete("token", '/');
+    this.cookies.set("token", token, undefined, '/');
   }
 
   getToken() {
     return this.cookies.get("token");
+  }
+
+  setTheme(theme: string) {
+    if (this.cookies.get("theme")) this.cookies.delete("theme", '/');
+    this.cookies.set("theme", theme, undefined, '/');
+  }
+
+  getTheme(): string {
+    return this.cookies.get("theme");
   }
 
   verifyToken() {
@@ -31,7 +41,7 @@ export class UserService {
   }
 
   logout() {
-    this.cookies.delete("token");
+    this.cookies.delete("token", "/");
     this.sessionEvent.emit(false);
   }
 

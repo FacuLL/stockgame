@@ -853,3 +853,22 @@ BEGIN
 	END IF;
 END $$
 DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER ADD_PARTICIPANTS
+	AFTER INSERT ON gameparticipants
+    FOR EACH ROW
+    BEGIN
+		IF (SELECT instanceid FROM gameparticipants WHERE userid=NEW.userid AND gameid=NEW.gameid) IS NOT NULL THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = "User already in game";
+		END IF;
+	END  $$
+DELIMITER ;
+
+CREATE VIEW USERSTOCK AS SELECT gp.instanceid, COALESCE(ss.stock,0) + COALESCE(cs.stock,0) + COALESCE(cms.stock,0) AS stocks FROM gameparticipants gp LEFT JOIN sharestock ss ON gp.instanceid=ss.instanceid LEFT JOIN currencystock cs ON gp.instanceid=cs.instanceid LEFT JOIN commoditystock cms ON gp.instanceid=cms.instanceid;
+CREATE VIEW USERTRANSACTIONS AS SELECT gp.instanceid, COALESCE(COUNT(st.transid), 0) + COALESCE(COUNT(ct.currtransid), 0) + COALESCE(COUNT(cmt.comtransid), 0) AS transactions FROM gameparticipants gp LEFT JOIN transaction st ON gp.gameid=st.gameid AND gp.userid=st.userid LEFT JOIN currencytransaction ct ON gp.gameid=ct.gameid AND gp.userid=ct.userid LEFT JOIN commoditytransaction cmt ON gp.gameid=cmt.gameid AND gp.userid=cmt.userid GROUP BY gp.instanceid;
+CREATE VIEW USERSTATS AS SELECT st.*, ut.transactions FROM USERSTOCK st INNER JOIN USERTRANSACTIONS ut ON st.instanceid=ut.instanceid;
+
+CREATE VIEW SHARE_STATS AS SELECT s.*, hs.quotation as lastquote, (hs.quotation * 100 / s.quotation) - 100 AS variation FROM share s LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sharecode ORDER BY date DESC) AS n FROM historicalshare) AS hs2 WHERE n=1) AS hs ON s.code=hs.sharecode;
+CREATE VIEW CURRENCY_STATS AS SELECT c.*, hc.quotation as lastquote, (hc.quotation * 100 / c.quotation) - 100 AS variation FROM currency c LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY currencycode ORDER BY date DESC) AS n FROM historicalcurrency) AS hc2 WHERE n=1) AS hc ON c.code=hc.currencycode;

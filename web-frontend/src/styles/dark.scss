@@ -42,3 +42,31 @@ body.dark .usermenu::before {
 body.dark .menubt {
     color: #eee;
 }
+
+body.dark .shape .shape-fill {
+    fill: #325596;
+}
+
+body.dark .shapefill {
+    background-color: #325596;
+}
+
+body.dark .menu {
+    background-color: #325596;
+}
+
+body.dark .menuselector {
+    background-color: #325596;
+}
+
+body.dark .selectorbt {
+    color: #eee;
+}
+
+body.dark .share:hover, body.dark .commodity:hover, body.dark .currency:hover {
+    background-color: rgb(75, 75, 75);
+}
+
+body.dark .variationdiv {
+    background-color: #eee;
+}

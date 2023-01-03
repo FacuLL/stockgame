@@ -45,7 +45,7 @@ exports.login = (req, response) => {
         encrypt.comparePassword(req.body.password, res[0].password,
         (error, match) => {
             if (error) return response.status(500).json({error: error.message});
-            if(!match) return response.sendStatus(403).json({error: "Username or password invalid"});
+            if(!match) return response.status(403).json({error: "Username or password invalid"});
             if (res[0].team===1) return response.sendStatus(403).json({error: "Can't login into a team"});
             let payload = {
                 userid: res[0].userid,
@@ -59,7 +59,7 @@ exports.login = (req, response) => {
 }
 
 exports.getPlayingGames = (req, response) => {
-    con.query(`SELECT * FROM game g INNER JOIN gameparticipants gp LEFT JOIN VARIATIONS v ON g.gameid=gp.gameid AND gp.userid=1 AND g.finished=0 AND v.instanceid=gp.instanceid;`,
+    con.query(`SELECT * FROM game g INNER JOIN gameparticipants gp INNER JOIN VARIATIONS v ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND g.finished=0 AND v.instanceid=gp.instanceid;`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -67,10 +67,34 @@ exports.getPlayingGames = (req, response) => {
 }
 
 exports.getGame = (req, response) => {
-    con.query(`SELECT g.*, gp.cash, v.variation FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} INNER JOIN VARIATIONS v ON gp.instanceid=v.instanceid`,
+    con.query(`SELECT g.*, gp.cash, v.variation, st.stocks, st.transactions FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} INNER JOIN VARIATIONS v ON gp.instanceid=v.instanceid INNER JOIN USERSTATS st ON gp.instanceid=st.instanceid`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
-        return response.status(200).json(res);
+        return response.status(200).json(res[0]);
+    });
+}
+
+exports.getFullGame = (req, response) => {
+    con.query(`SELECT g.*, gp.cash, v.variation, st.stocks, st.transactions FROM game g INNER JOIN gameparticipants gp ON g.gameid=gp.gameid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} INNER JOIN VARIATIONS v ON gp.instanceid=v.instanceid INNER JOIN USERSTATS st ON gp.instanceid=st.instanceid`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        if (!res[0]) return response.status(404).json({error: 'Game was not found'})
+        con.query(`SELECT s.*, ss.lastquote, ss.variation FROM share s INNER JOIN shareingame sg ON s.code=sg.sharecode AND sg.gameid=${res[0].gameid} INNER JOIN gameparticipants gp ON gp.gameid=sg.gameid AND gp.userid=${req.userid} INNER JOIN SHARE_STATS ss ON s.code=ss.code`,
+        (err2, res2) => {
+            if (err2) return response.status(500).json({error: err2.message});
+            res[0].shares = res2;
+            con.query(`SELECT c.*, cs.lastquote, cs.variation FROM currency c INNER JOIN currencyingame cg ON c.code=cg.currencycode AND cg.gameid=${res[0].gameid} INNER JOIN gameparticipants gp ON gp.gameid=cg.gameid AND gp.userid=${req.userid} INNER JOIN CURRENCY_STATS cs ON c.code=cs.code`,
+            (err3, res3) => {
+                if (err3) return response.status(500).json({error: err3.message});
+                res[0].currencies = res3;
+                con.query(`SELECT c.* FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=${req.params.gameid} INNER JOIN gameparticipants gp ON gp.gameid=cg.gameid AND gp.userid=${req.userid}`,
+                (err4, res4) => {
+                    if (err4) return response.status(500).json({error: err4.message});
+                    res[0].commodities = res4;
+                    return response.status(200).json(res[0]);
+                });
+            });
+        });
     });
 }
 
@@ -87,6 +111,36 @@ exports.getSharesInGame = (req, response) => {
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
+    });
+}
+
+exports.getCurrenciesInGame = (req, response) => {
+    con.query(`SELECT c.* FROM currency c INNER JOIN currencyingame cg ON c.code=cg.currencycode AND cg.gameid=${req.params.gameid} INNER JOIN gameparticipants gp ON gp.gameid=cg.gameid AND gp.userid=${req.userid}`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        return response.status(200).json(res);
+    });
+}
+
+exports.getCommoditiesInGame = (req, response) => {
+    con.query(`SELECT c.* FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=${req.params.gameid} INNER JOIN gameparticipants gp ON gp.gameid=cg.gameid AND gp.userid=${req.userid}`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        return response.status(200).json(res);
+    });
+}
+
+exports.getFullShare = (req, response) => {
+    con.query(`SELECT s.* FROM share s INNER JOIN shareingame sg INNER JOIN gameparticipants gp ON s.code=sg.sharecode AND sg.gameid=${req.params.gameid} AND sg.gameid=gp.gameid AND gp.userid=${req.userid} AND s.code='${req.params.sharecode}'`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        if (!res[0]) return response.status(404).json({error: 'Share was not found'});
+        con.query(`SELECT * FROM historicalshare WHERE sharecode='${res[0].code}'`,
+        (err2, res2) => {
+            if (err2) return response.status(500).json({error: err2.message});
+            res[0].historical = res2;
+            return response.status(200).json(res[0]);
+        });
     });
 }
 

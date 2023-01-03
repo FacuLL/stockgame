@@ -1,4 +1,4 @@
-<div class="container align">
+<div class="container align" [ngClass]="loaded ? 'loaded' : ''">
     <div class="grid">
         <form #f="ngForm" (ngSubmit)="login(f)" class="form login">
             <h1 class="text--center">Iniciar sesion</h1>
@@ -26,3 +26,5 @@
         </div>
     </div>
 </div>
+
+<div class="rotating-dots" [ngClass]="loaded ? 'loaded': ''"><div></div><div></div></div>

@@ -41,3 +41,23 @@ body.light .usermenu::before {
 body.light .menubt {
     color: black;
 }
+
+body.light .shape .shape-fill {
+    fill: #4C83EA;
+}
+
+body.light .shapefill {
+    background-color: #4C83EA;
+}
+
+body.light .menu {
+    background-color: #4C83EA;
+}
+
+body.light .menuselector {
+    background-color: #4C83EA;
+}
+
+body.light .share:hover, body.light .commodity:hover, body.light .currency:hover {
+    background-color: rgb(173, 173, 173);
+}

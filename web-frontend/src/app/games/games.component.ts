@@ -11,6 +11,8 @@ import { UserService } from '../services/user.service';
 })
 export class GamesComponent implements OnInit {
 
+  public loaded: boolean = false;
+
   public games: PlayingGames[] = [];
 
   public date: Date = new Date()
@@ -31,9 +33,8 @@ export class GamesComponent implements OnInit {
     this.gameService.getPlayingGames().subscribe({
       next: res => {
         this.games = res; 
-        console.log(this.games);
-        
-        if (res.length == 1) this.router.navigate(['/game', res[0].gameid]);
+        if (res.length == 1) this.router.navigate(['/game/', res[0].gameid]);
+        this.loaded = true;
       },
       error: err => {
         if (err.status == 403) {

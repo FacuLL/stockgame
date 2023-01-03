@@ -10,6 +10,8 @@ import { NavbarComponent } from '../navbar/navbar.component';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
+
+  public loaded: boolean = false;
   public err: string = "";
 
   constructor(private userService: UserService, private router: Router) { }
@@ -28,9 +30,11 @@ export class LoginComponent {
         error: err => {
           console.log(err.error);
           this.userService.logout();
+          this.loaded = true;
         }
       })
     }
+    else this.loaded = true;
   }
 
   login(f: NgForm) {

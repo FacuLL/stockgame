@@ -1,5 +1,6 @@
 @import url('./styles/dark.scss');
 @import url('./styles/light.scss');
+@import url('./styles/loading.css');
 
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
@@ -102,7 +103,26 @@ text-decoration: underline;
 }
 
 .container {
-height: 90%;
+    height: 90%;
+    transition: opacity 1s;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.container.loaded {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rotating-dots {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s;
+}
+
+.rotating-dots.loaded {
+    opacity: 0;
+    visibility: hidden;
 }
 
 input {

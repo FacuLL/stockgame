@@ -1,0 +1,24 @@
+.container {
+    padding-top: 20px;
+}
+
+.titlediv {
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    text-align: center;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 40px;
+    margin: 0;
+    margin-bottom: 8px;
+}
+
+.shareimage {
+    max-height: 50px;
+    margin-right: 20px;
+}

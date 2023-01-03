@@ -29,6 +29,11 @@ export class NavbarComponent implements OnInit {
   switchTheme() {
     document.body.classList.toggle('light');
     document.body.classList.toggle('dark');
+    if (!this.userService.getTheme() || this.userService.getTheme() == 'light')
+      this.userService.setTheme('dark');
+    else {
+      this.userService.setTheme('light');
+    }
   }
 
   public checkSession() {

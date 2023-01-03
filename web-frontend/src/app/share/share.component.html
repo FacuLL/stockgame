@@ -1,0 +1,10 @@
+<app-gamemenu [parent]="this"></app-gamemenu>
+
+<div class="container" [ngClass]="loaded ? 'loaded' : ''">
+    <div class="titlediv">
+        <img class="shareimage" [src]="share?.image ? backendAssetsUrl + 'shareimages/' + share?.image : defaultshareimage">
+        <h1 *ngIf="share" class="title">{{ share.name }}</h1>
+    </div>
+</div>
+
+<div class="rotating-dots" [ngClass]="loaded ? 'loaded': ''"><div></div><div></div></div>
