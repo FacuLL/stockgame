@@ -1,9 +1,9 @@
-INSERT INTO game (title, startDate, initialCash) VALUES ('prueba', sysdate(), 100000);
+INSERT INTO game (title, startDate, initialCash) VALUES ('EATA Temporada 2023', sysdate(), 100000);
 INSERT INTO game (title, startDate, initialCash) VALUES ('Prueba 2', sysdate(), 150000);
 INSERT INTO game (title, startDate, initialCash) VALUES ('prueba3', sysdate(), 200000);
 INSERT INTO game (title, startDate, initialCash) VALUES ('prueba4', sysdate(), 50000);
 
-INSERT INTO user (username, name, password) VALUES ('nperez', 'Nehuen Perez', 'sadjwoes');
+INSERT INTO user (username, name, password) VALUES ('nperez', 'Nehuen Perez', 'hola');
 INSERT INTO user (username, name, password) VALUES ('aabb', 'AAA BBBB', 'sadjwoes');
 INSERT INTO user (username, name, password) VALUES ('ccdd', 'CCCC DDDD', 'sadjwoes');
 INSERT INTO user (username, name, password) VALUES ('eeff', 'EEEE FFFF', 'sadjwoes');
@@ -15,7 +15,7 @@ INSERT INTO basicuser (userid, email, dni) VALUES (3, 'CCCC@DDDD.com', 20913821)
 INSERT INTO basicuser (userid, email, dni) VALUES (4, 'EEEEE@prueba123.com', 20913821);
 INSERT INTO basicuser (userid, email, dni) VALUES (5, 'GGGGG@prueba123.com', 20913821);
 
-INSERT INTO gameparticipants (gameid, userid, cash) VALUES (2, 1, (SELECT initialCash FROM game WHERE gameid=2));
+INSERT INTO gameparticipants (gameid, userid, cash) VALUES (1, 1, (SELECT initialCash FROM game WHERE gameid=1));
 INSERT INTO gameparticipants (gameid, userid, cash) VALUES (4, 2, (
 	SELECT initialCash FROM game WHERE gameid=4
 ));
@@ -27,7 +27,7 @@ INSERT INTO gameparticipants (gameid, userid, cash) VALUES (3, 4, (
 ));
 INSERT INTO gameparticipants (gameid, userid, cash) VALUES (3, 5, 1000000);
 
-INSERT INTO share (code, name, quotation, currency) VALUES ('YPF', 'YPF ARG', 2000, 'ARS');
+INSERT INTO share (code, name, quotation, currency, available) VALUES ('YPF', 'YPF ARG', 2000, 'ARS', true);
 
 INSERT INTO shareingame (gameid, sharecode) VALUES (2, 'YPFD.BA');
 SELECT * FROM shareingame;
@@ -72,21 +72,23 @@ CREATE TRIGGER UPDATE_CASH
 	FOR EACH ROW
 	BEGIN
 		DECLARE actualinstance INT;
+        DECLARE actualgame INT;
         DECLARE actualcash DECIMAL(9,2);
         DECLARE actualamount INT;
         DECLARE actualstockcurrency DECIMAL(9,2);
         
-        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
-        SET actualcash = (SELECT cash FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualgame = (SELECT gameid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualcash = (SELECT cash FROM gameparticipants WHERE instanceid=instanceid);
         SET actualamount = (SELECT stock FROM sharestock WHERE instanceid=actualinstance AND sharecode=NEW.sharecode);
         
-        IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
+        IF NOT (SELECT finished FROM game WHERE gameid=actualgame) THEN
 			IF actualinstance IS NOT NULL THEN
-				IF NEW.sharecode IN (SELECT code FROM share s INNER JOIN shareingame sg ON s.code=sg.sharecode AND sg.gameid=NEW.gameid) THEN
+				IF NEW.sharecode IN (SELECT code FROM share s INNER JOIN shareingame sg ON s.code=sg.sharecode AND sg.gameid=actualgame) THEN
 					IF NEW.currencycode = 'ARS' THEN
 						IF NEW.action='buy' THEN
 							IF actualcash >= (NEW.quotation * NEW.amount) THEN
-								UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+								UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE instanceid=actualinstance;
 								IF actualamount IS NULL THEN
 									INSERT INTO sharestock (instanceid, sharecode, stock) VALUES (actualinstance, NEW.sharecode, NEW.amount);
 								ELSE
@@ -98,7 +100,7 @@ CREATE TRIGGER UPDATE_CASH
 							END IF;
 						ELSEIF NEW.action='sell' THEN
 							IF actualamount >= NEW.amount THEN
-								UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+								UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE instanceid=actualinstance;
 								UPDATE sharestock SET stock=(actualamount - NEW.amount) WHERE instanceid=actualinstance AND sharecode=NEW.sharecode;
 							ELSE
 								SIGNAL SQLSTATE '45000'
@@ -109,7 +111,7 @@ CREATE TRIGGER UPDATE_CASH
 							SET MESSAGE_TEXT = "Invalid action";
 						END IF;
 					ELSE
-						IF NEW.currencycode IN (SELECT c.code FROM currency c INNER JOIN currencyInGame cg ON c.code=cg.currencycode AND cg.gameid=NEW.gameid) THEN
+						IF NEW.currencycode IN (SELECT c.code FROM currency c INNER JOIN currencyInGame cg ON c.code=cg.currencycode AND cg.gameid=actualgame) THEN
 							SET actualstockcurrency=(SELECT stock FROM currencystock WHERE instanceid=actualinstance AND currencycode=NEW.currencycode);
 							IF NEW.action = 'buy' THEN
 								IF actualstockcurrency >= (NEW.quotation * NEW.amount) THEN
@@ -162,21 +164,23 @@ CREATE TRIGGER UPDATE_CURRENCY_CASH
 	FOR EACH ROW
 	BEGIN
 		DECLARE actualinstance INT;
+        DECLARE actualgame INT;
         DECLARE actualcash DECIMAL(9,2);
         DECLARE actualamount INT;
         DECLARE actualstockcurrency DECIMAL(9,2);
         
-        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
-        SET actualcash = (SELECT cash FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualgame = (SELECT gameid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualcash = (SELECT cash FROM gameparticipants WHERE instanceid=NEW.instanceid);
         SET actualamount = (SELECT stock FROM currencystock WHERE instanceid=actualinstance AND currencycode=NEW.currencycode);
         
-        IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
+        IF NOT (SELECT finished FROM game WHERE gameid=actualgame) THEN
 			IF actualinstance IS NOT NULL THEN
-				IF NEW.currencycode IN (SELECT code FROM currency c INNER JOIN currencyingame cg ON c.code=cg.currencycode AND cg.gameid=NEW.gameid) THEN
+				IF NEW.currencycode IN (SELECT code FROM currency c INNER JOIN currencyingame cg ON c.code=cg.currencycode AND cg.gameid=actualgame) THEN
 					IF NEW.currencycode != 'ARS' THEN
 						IF NEW.action='buy' THEN
 							IF actualcash >= (NEW.quotation * NEW.amount) THEN
-								UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+								UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE insanceid=actualinstance;
 								IF actualamount IS NULL THEN
 									INSERT INTO currencystock (instanceid, currencycode, stock) VALUES (actualinstance, NEW.currencycode, NEW.amount);
 								ELSE
@@ -188,7 +192,7 @@ CREATE TRIGGER UPDATE_CURRENCY_CASH
 							END IF;
 						ELSEIF NEW.action='sell' THEN
 							IF actualamount IS NOT NULL AND actualamount >= NEW.amount THEN
-								UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+								UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE instanceid=actualinstance;
 								UPDATE currencystock SET stock=(actualamount - NEW.amount) WHERE instanceid=actualinstance AND currencycode=NEW.currencycode;
 							ELSE
 								SIGNAL SQLSTATE '45000'
@@ -224,20 +228,22 @@ CREATE TRIGGER UPDATE_COMMODITIY_CASH
 	FOR EACH ROW
 	BEGIN
 		DECLARE actualinstance INT;
+        DECLARE actualgame INT;
         DECLARE actualcash DECIMAL(9,2);
         DECLARE actualamount INT;
         DECLARE actualstockcommodity DECIMAL(9,2);
         
-        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
-        SET actualcash = (SELECT cash FROM gameparticipants WHERE gameid=NEW.gameid AND userid=NEW.userid);
+        SET actualinstance = (SELECT instanceid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualgame = (SELECT gameid FROM gameparticipants WHERE instanceid=NEW.instanceid);
+        SET actualcash = (SELECT cash FROM gameparticipants WHERE instanceid=NEW.instanceid);
         SET actualamount = (SELECT stock FROM commoditystock WHERE instanceid=actualinstance AND commodityid=NEW.commodityid);
         
-        IF NOT (SELECT finished FROM game WHERE gameid=NEW.gameid) THEN
+        IF NOT (SELECT finished FROM game WHERE gameid=actualgame) THEN
 			IF actualinstance IS NOT NULL THEN
-				IF NEW.commodityid IN (SELECT commodityid FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=NEW.gameid) THEN
+				IF NEW.commodityid IN (SELECT commodityid FROM commodity c INNER JOIN commodityingame cg ON c.commodityid=cg.commodityid AND cg.gameid=actualgame) THEN
 					IF NEW.action='buy' THEN
 						IF actualcash >= (NEW.quotation * NEW.amount) THEN
-							UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							UPDATE gameparticipants SET cash=(actualcash - (NEW.quotation * NEW.amount)) WHERE instanceid=actualinstance;
 							IF actualamount IS NULL THEN
 								INSERT INTO commoditystock (instanceid, commodityid, stock) VALUES (actualinstance, NEW.commodityid, NEW.amount);
 							ELSE
@@ -249,7 +255,7 @@ CREATE TRIGGER UPDATE_COMMODITIY_CASH
 						END IF;
 					ELSEIF NEW.action='sell' THEN
 						IF actualamount IS NOT NULL AND actualamount >= NEW.amount THEN
-							UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE gameid=NEW.gameid AND userid=NEW.userid;
+							UPDATE gameparticipants SET cash=(actualcash + (NEW.quotation * NEW.amount)) WHERE instanceid=actualinstance;
 							UPDATE commoditystock SET stock=(actualamount - NEW.amount) WHERE instanceid=actualinstance AND commodityid=NEW.commodityid;
 						ELSE
 							SIGNAL SQLSTATE '45000'
@@ -274,7 +280,6 @@ CREATE TRIGGER UPDATE_COMMODITIY_CASH
 	END; 
 $$ DELIMITER ;
 
-DROP VIEW VARIATIONS;
 CREATE VIEW VARIATIONS AS SELECT gp.instanceid, gp.cash/g.initialCash*100-100 AS variation FROM gameparticipants gp INNER JOIN game g ON g.gameid=gp.gameid;
 
 DELIMITER $$
@@ -380,7 +385,6 @@ BEGIN
 END $$
 DELIMITER ;
 
-DROP TRIGGER ADD_PARTICIPANTS;
 DELIMITER $$
 CREATE TRIGGER ADD_PARTICIPANTS
 	BEFORE INSERT ON gameparticipants
@@ -396,10 +400,9 @@ CREATE TRIGGER ADD_PARTICIPANTS
 DELIMITER ;
 
 CREATE VIEW USERSTOCK AS SELECT gp.instanceid, COALESCE(ss.stock,0) + COALESCE(cms.stock,0) AS stocks FROM gameparticipants gp LEFT JOIN sharestock ss ON gp.instanceid=ss.instanceid LEFT JOIN commoditystock cms ON gp.instanceid=cms.instanceid;
-CREATE VIEW USERTRANSACTIONS AS SELECT gp.instanceid, COALESCE(COUNT(st.transid), 0) + COALESCE(COUNT(ct.currtransid), 0) + COALESCE(COUNT(cmt.comtransid), 0) AS transactions FROM gameparticipants gp LEFT JOIN transaction st ON gp.gameid=st.gameid AND gp.userid=st.userid LEFT JOIN currencytransaction ct ON gp.gameid=ct.gameid AND gp.userid=ct.userid LEFT JOIN commoditytransaction cmt ON gp.gameid=cmt.gameid AND gp.userid=cmt.userid GROUP BY gp.instanceid;
+CREATE VIEW USERTRANSACTIONS AS SELECT gp.instanceid, COALESCE(COUNT(st.transid), 0) + COALESCE(COUNT(ct.currtransid), 0) + COALESCE(COUNT(cmt.comtransid), 0) AS transactions FROM gameparticipants gp LEFT JOIN transaction st ON gp.instanceid=st.instanceid LEFT JOIN currencytransaction ct ON gp.instanceid=ct.instanceid LEFT JOIN commoditytransaction cmt ON gp.instanceid=cmt.instanceid GROUP BY gp.instanceid;
 CREATE VIEW USERSTATS AS SELECT st.*, ut.transactions FROM USERSTOCK st INNER JOIN USERTRANSACTIONS ut ON st.instanceid=ut.instanceid;
 
-DROP VIEW SHARE_STATS;
-DROP VIEW CURRENCY_STATS;
-CREATE VIEW SHARE_STATS AS SELECT s.*, hs.quotation as lastquote, (hs.quotation * 100 / s.quotation) - 100 AS variation FROM share s LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sharecode ORDER BY date DESC) AS n FROM historicalshare) AS hs2 WHERE n=1) AS hs ON s.code=hs.sharecode;
+CREATE VIEW SHARE_STATS AS SELECT s.*, hs.open as lastquote, (hs.open * 100 / s.quotation) - 100 AS variation FROM share s LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY sharecode ORDER BY date DESC) AS n FROM historicalshare) AS hs2 WHERE n=1) AS hs ON s.code=hs.sharecode;
 CREATE VIEW CURRENCY_STATS AS SELECT c.*, hc.quotation as lastquote, (hc.quotation * 100 / c.quotation) - 100 AS variation FROM currency c LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY currencycode ORDER BY date DESC) AS n FROM historicalcurrency) AS hc2 WHERE n=1) AS hc ON c.code=hc.currencycode;
+CREATE VIEW COMMODITY_STATS AS SELECT c.*, hc.open as lastquote, (hc.open * 100 / c.quotation) - 100 AS variation FROM commodity c LEFT JOIN (SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY commodityid ORDER BY date DESC) AS n FROM historicalcommodity) AS hc2 WHERE n=1) AS hc ON c.commodityid=hc.commodityid;

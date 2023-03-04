@@ -1,3 +1,5 @@
+import { HistoricalData } from "./Data"
+
 interface GameShare {
     code: string
     name: string
@@ -9,7 +11,7 @@ interface GameShare {
     lastquote: number
     variation: number
     endpoint?: string
-    historical?: number
+    historical?: HistoricalData[]
 }
 
 export { GameShare }

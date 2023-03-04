@@ -24,6 +24,8 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { ShareComponent } from './share/share.component';
 import { CurrencyComponent } from './currency/currency.component';
 import { CommodityComponent } from './commodity/commodity.component';
+import { StockgraphComponent } from './stockgraph/stockgraph.component';
+ 
 const icons = {
   IconUser,
   IconLock,
@@ -62,7 +64,8 @@ const icons = {
     TransactionsComponent,
     ShareComponent,
     CurrencyComponent,
-    CommodityComponent
+    CommodityComponent,
+    StockgraphComponent
   ],
   imports: [
     BrowserModule,

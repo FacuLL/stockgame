@@ -162,18 +162,6 @@
     transition: background 0.5s linear, top 0.5s, opacity 0.5s, visibility 0.5s;
 }
 
-.usermenu::before {
-    content: "";
-    position: absolute;
-    top: -5px;
-    right: 28px;
-    width: 20px;
-    height: 20px;
-    transform: rotate(45deg);
-    transition: background 0.5s linear;
-    z-index: 1;
-  }
-
 .usermenu p {
     margin: 0;
     z-index: 2;
@@ -189,6 +177,7 @@
     font-family: 'Heebo', sans-serif;
     font-size: 16px;
     text-align: center;
+    z-index: 3;
 }
 
 .usermenu-type {

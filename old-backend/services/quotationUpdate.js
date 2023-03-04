@@ -46,8 +46,8 @@ function currencyUpdate() {
     con.query(`SELECT code, quotation FROM currency WHERE automatized=1`,
     (err, res) => {
         if (err) return console.log(err.message);
-        res.forEach(currency => {
-            if (currency.code=='USD') USDUpdate(currency.quotation);
+        res.forEach(async currency => {
+            if (currency.code=='USD') await USDUpdate(currency.quotation);
             else if (currency.code=='ARS') {}
             else {
                 yahooFinance.quote({symbol: currency.code + "ARS=X", modules: [ 'price' ]}, 
@@ -67,9 +67,9 @@ function currencyUpdate() {
     });
 }
 
-function USDUpdate(quotation) {
+async function USDUpdate(quotation) {
     try {
-        fetch('https://api.estadisticasbcra.com/usd_of', {
+        await fetch('https://api.estadisticasbcra.com/usd_of', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${process.env.BCRA_BEARER}`,

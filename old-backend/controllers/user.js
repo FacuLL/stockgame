@@ -135,7 +135,7 @@ exports.getFullShare = (req, response) => {
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         if (!res[0]) return response.status(404).json({error: 'Share was not found'});
-        con.query(`SELECT * FROM historicalshare WHERE sharecode='${res[0].code}'`,
+        con.query(`SELECT date, quotation FROM historicalshare WHERE sharecode='${res[0].code}'`,
         (err2, res2) => {
             if (err2) return response.status(500).json({error: err2.message});
             res[0].historical = res2;
@@ -161,7 +161,7 @@ exports.getSharesStock = (req, response) => {
 }
 
 exports.getTransactions = (req, response) => {
-    con.query(`SELECT * FROM transaction WHERE userid=${req.userid} AND gameid=${req.params.gameid} ORDER BY date DESC`,
+    con.query(`SELECT * FROM transaction st INNER JOIN gameparticipants gp ON st.instanceid=gp.instanceid ANG gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} ORDER BY date DESC`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);
@@ -169,7 +169,15 @@ exports.getTransactions = (req, response) => {
 }
 
 exports.getCurrencyTransactions = (req, response) => {
-    con.query(`SELECT * FROM currencytransaction WHERE userid=${req.userid} AND gameid=${req.params.gameid} ORDER BY date DESC`,
+    con.query(`SELECT * FROM currencytransaction ct INNER JOIN gameparticipants gp ON ct.instanceid=gp.instanceid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} ORDER BY date DESC`,
+    (err, res) => {
+        if (err) return response.status(500).json({error: err.message});
+        return response.status(200).json(res);
+    });
+}
+
+exports.getCommodityTransactions = (req, response) => {
+    con.query(`SELECT * FROM commoditytransaction ct INNER JOIN gameparticipants gp ON ct.instanceid=gp.instanceid AND gp.userid=${req.userid} AND gp.gameid=${req.params.gameid} ORDER BY date DESC`,
     (err, res) => {
         if (err) return response.status(500).json({error: err.message});
         return response.status(200).json(res);

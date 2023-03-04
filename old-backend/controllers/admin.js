@@ -180,9 +180,9 @@ exports.createShare = (req, response) => {
             yahooFinance.historical({symbol: req.body.code, from: '2019-01-01'}, 
             (quoteerr, quotes) => {
                 if (quoteerr) return response.status(500).json({error: quoteerr.message});
-                let query = "INSERT INTO historicalshare (sharecode, date, quotation) VALUES ";
+                let query = "INSERT INTO historicalshare (sharecode, date, high, low, open, close, volume) VALUES ";
                 quotes.forEach(quote => {
-                    query+=`('${req.body.code}', '${stringifyDate(quote.date)}', ${quote.close}),`
+                    query+=`('${req.body.code}', '${stringifyDate(quote.date)}', ${quote.high}, ${quote.low}, ${quote.open}, ${quote.close}, ${quote.volume}),`
                 });
                 query = query.slice(0, -1);
                 con.query(query,
@@ -261,6 +261,11 @@ function createUSD(req, response) {
 }
 
 exports.createCommodity = (req, response) => {
+    if (req.body.endpoint == 'yahoo') createYahooCommodity(req,response);
+    if (req.body.endpoint == 'bcr') createBCRCommodity(req, response);
+}
+
+function createYahooCommodity(req, response) {
     
 }
 

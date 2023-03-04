@@ -65,6 +65,8 @@ export class GameService implements OnInit {
   }
 
   loadGame(gameid: number) {
+    console.log("hola2");
+    
     if (isNaN(gameid)) return this.gameLoadEvent.emit(404);
     this.getFullGame(gameid).subscribe({
       next: (res:PlayingGames) => {
@@ -79,6 +81,8 @@ export class GameService implements OnInit {
   }
 
   loadShare(code: string | null, gameid?: number) {
+    console.log("hola");
+    
     if (!gameid) return;
     if (code == null) return this.shareLoadEvent.emit(404);
     this.getFullShare(gameid, code).subscribe({

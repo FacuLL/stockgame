@@ -1,0 +1,7 @@
+<div class="chart-box">
+    <div id="chart-candlestick">
+    </div>
+    <div id="chart-bar" *ngIf="loaded">
+    </div>
+    <div class="rotating-dots" [ngClass]="loaded ? 'loaded': ''"><div></div><div></div></div>
+  </div>

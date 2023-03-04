@@ -166,6 +166,7 @@
     opacity: 0;
     transform: rotate(270deg);
     margin-right: -20px;
+    z-index: -1;
     transition: opacity 0.5s, transform 0.5s, margin-right 0.5s;
 }
 

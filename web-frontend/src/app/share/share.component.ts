@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Route, Router } from '@angular/router';
+import { HistoricalData } from '../models/Data';
 import { PlayingGames } from '../models/Game';
 import { GameShare } from '../models/Share';
 import { GameService } from '../services/game.service';
@@ -15,6 +16,9 @@ export class ShareComponent implements OnInit {
   public loaded: boolean = false;
   public game?: PlayingGames = this.gameService.loadedGame;
   public share?: GameShare = this.gameService.loadedShare;
+  public data?: HistoricalData[] = this.gameService.loadedShare?.historical;
+
+  public stockevent: EventEmitter<number> = this.gameService.shareLoadEvent;
 
   public backendAssetsUrl = "http://localhost:3000/";
   public defaultshareimage = "";;
@@ -44,6 +48,7 @@ export class ShareComponent implements OnInit {
       next: (res: number) => {
         if (res == 200) {
           this.share = this.gameService.loadedShare;
+          this.data = this.gameService.loadedShare?.historical;
           this.loaded = true;
         }
         else if (res == 403) {
@@ -59,7 +64,7 @@ export class ShareComponent implements OnInit {
 
   checkShare() {
     this.route.paramMap.subscribe((params: ParamMap) => {
-      if (params.get('id') != this.gameService.loadedShare?.code)
+      if (params.get('code') != this.gameService.loadedShare?.code)
         this.gameService.loadShare(params.get('code'), this.game?.gameid);
       else this.loaded = true;
     });

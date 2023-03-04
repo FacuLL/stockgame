@@ -1,10 +1,17 @@
 <app-gamemenu [parent]="this"></app-gamemenu>
 
 <div class="container" [ngClass]="loaded ? 'loaded' : ''">
-    <div class="titlediv">
-        <img class="shareimage" [src]="share?.image ? backendAssetsUrl + 'shareimages/' + share?.image : defaultshareimage">
-        <h1 *ngIf="share" class="title">{{ share.name }}</h1>
+    <div class="sharetitlediv" *ngIf="share">
+        <img class="shareimage" [src]="share.image ? backendAssetsUrl + 'shareimages/' + share.image : defaultshareimage">
+        <div class="titlediv">
+            <h1 *ngIf="share" class="title">{{ share.name }}</h1>
+            <p class="sharecode">
+                ({{ share.code }})
+                <span class="titletype">Acción</span>
+            </p>
+        </div>
     </div>
+    <app-stockgraph [parent]="this"></app-stockgraph>
 </div>
 
 <div class="rotating-dots" [ngClass]="loaded ? 'loaded': ''"><div></div><div></div></div>

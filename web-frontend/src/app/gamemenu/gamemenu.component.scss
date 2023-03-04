@@ -2,6 +2,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s;
+    z-index: 5;
 }
 
 .gamemenu.loaded {
@@ -23,7 +24,7 @@
     width: 100%;
     height: fit-content;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
 .menuselector {
