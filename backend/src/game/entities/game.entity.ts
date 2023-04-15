@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   Index,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -9,6 +11,8 @@ import { Commodityingame } from "../../../../../output/entities/Commodityingame"
 import { Currencyingame } from "../../../../../output/entities/Currencyingame";
 import { Gameparticipants } from "../../../../../output/entities/Gameparticipants";
 import { Shareingame } from "../../../../../output/entities/Shareingame";
+import { User } from "src/user/entities/user.entity";
+import { Share } from "src/share/entities/share.entity";
 
 @Index("gameid_UNIQUE", ["gameid"], { unique: true })
 @Entity("game", { schema: "marketgame" })
@@ -31,18 +35,15 @@ export class Game {
   @Column("decimal", { name: "initialCash", precision: 9, scale: 2 })
   initialCash: string;
 
-  @OneToMany(() => Commodityingame, (commodityingame) => commodityingame.game)
-  commodityingames: Commodityingame[];
+  @ManyToMany(() => Share, (share) => share.games)
+  shares: Share[];
 
-  @OneToMany(() => Currencyingame, (currencyingame) => currencyingame.game)
-  currencyingames: Currencyingame[];
+  @ManyToMany(() => User)
+  participants: User[];
 
-  @OneToMany(
-    () => Gameparticipants,
-    (gameparticipants) => gameparticipants.game
-  )
-  gameparticipants: Gameparticipants[];
+  // @OneToMany(() => Commodityingame, (commodityingame) => commodityingame.game)
+  // commodityingames: Commodityingame[];
 
-  @OneToMany(() => Shareingame, (shareingame) => shareingame.game)
-  shareingames: Shareingame[];
+  // @OneToMany(() => Currencyingame, (currencyingame) => currencyingame.game)
+  // currencyingames: Currencyingame[];
 }

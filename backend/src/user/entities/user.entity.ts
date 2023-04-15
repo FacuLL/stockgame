@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -9,6 +11,7 @@ import {
 import { Basicuser } from "../../basicuser/entities/basicuser.entity";
 import { Gameparticipants } from "../../../../../output/entities/Gameparticipants";
 import { Team } from "../../../../../output/entities/Team";
+import { Game } from "src/game/entities/game.entity";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Entity("user", { schema: "marketgame" })
@@ -31,15 +34,13 @@ export class User {
   @OneToOne(() => Basicuser, (basicuser) => basicuser.user)
   basicuser: Basicuser;
 
-  @OneToMany(
-    () => Gameparticipants,
-    (gameparticipants) => gameparticipants.user
-  )
-  gameparticipants: Gameparticipants[];
+  @ManyToMany(() => Game)
+  @JoinTable()
+  games: Game[];
 
-  @OneToMany(() => Team, (team) => team.creator)
-  teams: Team[];
+  // @OneToMany(() => Team, (team) => team.creator)
+  // teams: Team[];
 
-  @OneToOne(() => Team, (team) => team.user)
-  team2: Team;
+  // @OneToOne(() => Team, (team) => team.user)
+  // team2: Team;
 }

@@ -1,6 +1,7 @@
-import { Column, Entity, Index, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { Historicalshare } from "../../../../../output/entities/Historicalshare";
 import { Shareingame } from "../../../../../output/entities/Shareingame";
+import { Game } from "src/game/entities/game.entity";
 
 @Index("code_UNIQUE", ["code"], { unique: true })
 @Entity("share", { schema: "marketgame" })
@@ -49,6 +50,7 @@ export class Share {
   )
   historicalshares: Historicalshare[];
 
-  @OneToMany(() => Shareingame, (shareingame) => shareingame.sharecode2)
-  shareingames: Shareingame[];
+  @ManyToMany(() => Game)
+  @JoinTable()
+  games: Game[];
 }
