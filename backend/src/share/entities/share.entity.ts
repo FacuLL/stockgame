@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
-import { Historicalshare } from "../../../../../output/entities/Historicalshare";
-import { Shareingame } from "../../../../../output/entities/Shareingame";
+import { Historicalshare } from "../../entities/Historicalshare";
+import { Shareingame } from "../../entities/Shareingame";
 import { Game } from "src/game/entities/game.entity";
 
 @Index("code_UNIQUE", ["code"], { unique: true })

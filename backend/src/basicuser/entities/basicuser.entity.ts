@@ -7,8 +7,8 @@ import {
   OneToOne,
 } from "typeorm";
 import { User } from "./User";
-import { Teaminvitations } from "../../../../../output/entities/Teaminvitations";
-import { Teamparticipants } from "../../../../../output/entities/Teamparticipants";
+import { Teaminvitations } from "../../entities/Teaminvitations";
+import { Teamparticipants } from "../../entities/Teamparticipants";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Index("bUser_user", ["userid"], {})

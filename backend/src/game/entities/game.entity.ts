@@ -7,10 +7,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Commodityingame } from "../../../../../output/entities/Commodityingame";
-import { Currencyingame } from "../../../../../output/entities/Currencyingame";
-import { Gameparticipants } from "../../../../../output/entities/Gameparticipants";
-import { Shareingame } from "../../../../../output/entities/Shareingame";
+import { Commodityingame } from "../../entities/Commodityingame";
+import { Currencyingame } from "../../entities/Currencyingame";
+import { Gameparticipants } from "../../entities/Gameparticipants";
+import { Shareingame } from "../../entities/Shareingame";
 import { User } from "src/user/entities/user.entity";
 import { Share } from "src/share/entities/share.entity";
 

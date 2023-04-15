@@ -9,8 +9,8 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Basicuser } from "../../basicuser/entities/basicuser.entity";
-import { Gameparticipants } from "../../../../../output/entities/Gameparticipants";
-import { Team } from "../../../../../output/entities/Team";
+import { Gameparticipants } from "../../entities/Gameparticipants";
+import { Team } from "../../entities/Team";
 import { Game } from "src/game/entities/game.entity";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })

@@ -6,9 +6,9 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Currencyingame } from "../../../../../output/entities/Currencyingame";
-import { Gameparticipants } from "../../../../../output/entities/Gameparticipants";
-import { Shareingame } from "../../../../../output/entities/Shareingame";
+import { Currencyingame } from "../../entities/Currencyingame";
+import { Gameparticipants } from "../../entities/Gameparticipants";
+import { Shareingame } from "../../entities/Shareingame";
 
 @Index("transid_UNIQUE", ["transid"], { unique: true })
 @Index("trans_user_idx", ["instanceid"], {})
