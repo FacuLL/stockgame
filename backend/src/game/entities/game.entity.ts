@@ -4,46 +4,57 @@ import {
   Index,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Commodityingame } from "../../entities/Commodityingame";
-import { Currencyingame } from "../../entities/Currencyingame";
-import { Gameparticipants } from "../../entities/Gameparticipants";
-import { Shareingame } from "../../entities/Shareingame";
 import { User } from "src/user/entities/user.entity";
 import { Share } from "src/share/entities/share.entity";
+import { Institution } from "src/institution/entities/institution.entity";
+import { CreateGameDto } from "../dto/create-game.dto";
 
 @Index("gameid_UNIQUE", ["gameid"], { unique: true })
 @Entity("game", { schema: "marketgame" })
 export class Game {
-  @PrimaryGeneratedColumn({ type: "int", name: "gameid" })
+  @PrimaryGeneratedColumn()
   gameid: number;
 
-  @Column("varchar", { name: "title", length: 45 })
+  @Column({ length: 45 })
   title: string;
 
-  @Column("date", { name: "startDate" })
+  @Column("date")
   startDate: string;
 
-  @Column("date", { name: "finishDate", nullable: true })
-  finishDate: string | null;
+  @Column("date", { nullable: true })
+  finishDate?: string;
 
-  @Column("tinyint", { name: "finished", width: 1, default: () => "'0'" })
+  @Column({ width: 1, default: () => "'0'" })
   finished: boolean;
 
-  @Column("decimal", { name: "initialCash", precision: 9, scale: 2 })
-  initialCash: string;
+  @Column({ precision: 9, scale: 2 })
+  initialCash: number;
 
   @ManyToMany(() => Share, (share) => share.games)
   shares: Share[];
 
-  @ManyToMany(() => User)
-  participants: User[];
+  @ManyToMany(() => Institution, (institution) => institution.games)
+  institutions: Institution[];
+
+  @ManyToOne(() => Institution)
+  owner: Institution;
+
+  constructor(data: CreateGameDto) {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+  }
+
+  isFinished() {
+    return this.finished || (this.finishDate && new Date(this.finishDate) <= new Date());
+  }
 
   // @OneToMany(() => Commodityingame, (commodityingame) => commodityingame.game)
   // commodityingames: Commodityingame[];
 
   // @OneToMany(() => Currencyingame, (currencyingame) => currencyingame.game)
   // currencyingames: Currencyingame[];
+
 }

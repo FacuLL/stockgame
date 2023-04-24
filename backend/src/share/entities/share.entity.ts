@@ -1,12 +1,11 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { Historicalshare } from "../../entities/Historicalshare";
-import { Shareingame } from "../../entities/Shareingame";
 import { Game } from "src/game/entities/game.entity";
 
 @Index("code_UNIQUE", ["code"], { unique: true })
 @Entity("share", { schema: "marketgame" })
 export class Share {
-  @Column("varchar", { primary: true, name: "code", length: 10 })
+  @PrimaryColumn("varchar", { name: "code", length: 10 })
   code: string;
 
   @Column("varchar", { name: "name", length: 45 })
@@ -40,9 +39,6 @@ export class Share {
 
   @Column("decimal", { name: "daylow", precision: 9, scale: 2 })
   daylow: string;
-
-  @Column("decimal", { name: "volume", precision: 9, scale: 2 })
-  volume: string;
 
   @OneToMany(
     () => Historicalshare,

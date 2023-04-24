@@ -4,14 +4,16 @@ import {
   Index,
   JoinTable,
   ManyToMany,
-  OneToMany,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Basicuser } from "../../basicuser/entities/basicuser.entity";
-import { Gameparticipants } from "../../entities/Gameparticipants";
-import { Team } from "../../entities/Team";
-import { Game } from "src/game/entities/game.entity";
+import { Institution } from "src/institution/entities/institution.entity";
+import { BasicUser } from "src/basicuser/entities/basicuser.entity";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { UpdateUserDto } from "../dto/update-user.dto";
+
+type UserType = "basicuser" | "team" | "admin" | "master";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Entity("user", { schema: "marketgame" })
@@ -25,18 +27,33 @@ export class User {
   @Column("varchar", { name: "image", nullable: true, length: 45 })
   image: string | null;
 
-  @Column("tinyint", { name: "team", width: 1, default: () => "'0'" })
-  team: boolean;
-
   @Column("tinyint", { name: "publicprofile", width: 1, default: () => "'0'" })
   publicprofile: boolean;
 
-  @OneToOne(() => Basicuser, (basicuser) => basicuser.user)
-  basicuser: Basicuser;
+  @Column("varchar", {length: 15})
+  type: UserType;
 
-  @ManyToMany(() => Game)
-  @JoinTable()
-  games: Game[];
+  @ManyToOne(() => Institution, (institution) => institution.users)
+  institution: Institution;
+
+  @OneToOne(() => BasicUser, (basicuser) => basicuser.user)
+  basicuser: BasicUser
+
+  constructor(data: CreateUserDto, type: UserType) {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+    this.type = type;
+  }
+
+  updateData(data: UpdateUserDto): void {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+  }
+
+  // @Column("tinyint", { name: "team", width: 1, default: () => "'0'" })
+  // isTeam: boolean;
 
   // @OneToMany(() => Team, (team) => team.creator)
   // teams: Team[];

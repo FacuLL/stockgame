@@ -1,50 +1,67 @@
+import * as bcrypt from 'bcrypt';
 import {
   Column,
   Entity,
   Index,
   JoinColumn,
-  OneToMany,
   OneToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
-import { User } from "./User";
-import { Teaminvitations } from "../../entities/Teaminvitations";
-import { Teamparticipants } from "../../entities/Teamparticipants";
+import { User } from "src/user/entities/user.entity";
+import { CreateBasicuserDto } from "../dto/create-basicuser.dto";
+import { UpdateBasicuserDto } from "../dto/update-basicuser.dto";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Index("bUser_user", ["userid"], {})
 @Entity("basicuser", { schema: "marketgame" })
-export class Basicuser {
-  @Column("int", { name: "userid", unique: true })
-  userid: number;
+export class BasicUser {
+  @PrimaryGeneratedColumn()
+  basicuserid: number;
 
-  @Column("varchar", { name: "email", length: 45 })
-  email: string;
+  @Column({ length: 45, nullable: true })
+  email?: string;
 
-  @Column("int", { name: "dni" })
-  dni: number;
+  @Column({ length: 60 })
+  private password: string;
 
-  @Column("tinyint", { name: "admin", width: 1, default: () => "'0'" })
-  admin: boolean;
-
-  @Column("varchar", { name: "password", length: 60 })
-  password: string;
-
-  @Column("varchar", { primary: true, name: "username", length: 45 })
+  @Column({ primary: true, length: 45 })
   username: string;
 
   @OneToOne(() => User, (user) => user.basicuser, {
-    onDelete: "NO ACTION",
-    onUpdate: "NO ACTION",
+    onDelete: "CASCADE"
   })
-  @JoinColumn([{ name: "userid", referencedColumnName: "userid" }])
+  @JoinColumn()
   user: User;
 
-  @OneToMany(() => Teaminvitations, (teaminvitations) => teaminvitations.user)
-  teaminvitations: Teaminvitations[];
+  constructor(data: CreateBasicuserDto, user: User) {
+    if (user.type != "basicuser") throw new Error("User must be of type 'basicuser'");
+    for (let property in data) {
+      this[property] = data[property];
+    }
+    this.user = user;
+  }
 
-  @OneToMany(
-    () => Teamparticipants,
-    (teamparticipants) => teamparticipants.user
-  )
-  teamparticipants: Teamparticipants[];
+  updateData(data: UpdateBasicuserDto): void {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+  }
+
+  removeSensibleData(): void {
+    delete this.password;
+  }
+
+  async comparePassword(password: string): Promise<boolean> {
+    const isMatch = await bcrypt.compare(password, this.password);
+    return isMatch;
+  }
+
+  // @OneToMany(() => Teaminvitations, (teaminvitations) => teaminvitations.user)
+  // teaminvitations: Teaminvitations[];
+
+  // @OneToMany(
+  //   () => Teamparticipants,
+  //   (teamparticipants) => teamparticipants.user
+  // )
+  // teamparticipants: Teamparticipants[];
 }
