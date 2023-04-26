@@ -12,8 +12,7 @@ import { Institution } from "src/institution/entities/institution.entity";
 import { BasicUser } from "src/basicuser/entities/basicuser.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
-
-type UserType = "basicuser" | "team" | "admin" | "master";
+import { UserType } from "src/types/users.type";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Entity("user", { schema: "marketgame" })
@@ -33,11 +32,11 @@ export class User {
   @Column("varchar", {length: 15})
   type: UserType;
 
-  @ManyToOne(() => Institution, (institution) => institution.users)
+  @OneToOne(() => Institution, (institution) => institution.user)
   institution: Institution;
 
   @OneToOne(() => BasicUser, (basicuser) => basicuser.user)
-  basicuser: BasicUser
+  basicuser: BasicUser;
 
   constructor(data: CreateUserDto, type: UserType) {
     for (let property in data) {

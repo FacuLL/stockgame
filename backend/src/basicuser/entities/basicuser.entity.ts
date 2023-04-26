@@ -4,12 +4,15 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "src/user/entities/user.entity";
 import { CreateBasicuserDto } from "../dto/create-basicuser.dto";
 import { UpdateBasicuserDto } from "../dto/update-basicuser.dto";
+import { Institution } from 'src/institution/entities/institution.entity';
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Index("bUser_user", ["userid"], {})
@@ -21,7 +24,7 @@ export class BasicUser {
   @Column({ length: 45, nullable: true })
   email?: string;
 
-  @Column({ length: 60 })
+  @Column({ length: 60, select: false })
   private password: string;
 
   @Column({ primary: true, length: 45 })
@@ -32,6 +35,12 @@ export class BasicUser {
   })
   @JoinColumn()
   user: User;
+
+  @ManyToOne(() => Institution, (institution) => institution.users, {
+    onDelete: "CASCADE"
+  })
+  @JoinTable()
+  institution: Institution;
 
   constructor(data: CreateBasicuserDto, user: User) {
     if (user.type != "basicuser") throw new Error("User must be of type 'basicuser'");
@@ -45,10 +54,6 @@ export class BasicUser {
     for (let property in data) {
       this[property] = data[property];
     }
-  }
-
-  removeSensibleData(): void {
-    delete this.password;
   }
 
   async comparePassword(password: string): Promise<boolean> {

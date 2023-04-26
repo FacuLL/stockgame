@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import {
     Column,
     Entity,
@@ -14,6 +15,7 @@ import { Game } from "src/game/entities/game.entity";
 import { Plan } from "src/plan/entities/plan.entity";
 import { CreateInstitutionDto } from "../dto/create-institution.dto";
 import { UpdateInstitutionDto } from "../dto/update-institution.dto";
+import { BasicUser } from 'src/basicuser/entities/basicuser.entity';
   
   @Index("institutionid_UNIQUE", ["institutionid"], { unique: true })
   @Entity("institution", { schema: "marketgame" })
@@ -27,41 +29,41 @@ import { UpdateInstitutionDto } from "../dto/update-institution.dto";
     @Column({ length: 45, nullable: true })
     email?: string;
 
-    @Column({ length: 60 })
+    @Column({ length: 60, select: false })
     private password: string;
   
-    @Column({ width: 1, default: () => "'0'" })
+    @Column({ width: 1, default: () => "'0'", select: false })
     paid: boolean;
 
     @ManyToOne(() => Plan, (plan) => plan.institutions)
+    @JoinTable()
     plan: Plan;
 
     @ManyToMany(() => Game, (game) => game.institutions)
     @JoinTable()
     games: Game[];
 
+    @OneToOne(() => User, (user) => user.institution)
+    @JoinTable()
+    user: User;
+
     @OneToMany(() => Game, (game) => game.owner)
     ownergames: Game[];
   
-    @OneToMany(() => User, (user) => user.institution)
-    users: User[];
+    @OneToMany(() => BasicUser, (basicuser) => basicuser.institution)
+    users: BasicUser[];
 
-    constructor(data: CreateInstitutionDto) {
+    constructor(data: CreateInstitutionDto, user: User) {
       for (let property in data) {
         this[property] = data[property];
       }
+      this.user = user;
     }
 
     updateData(data: UpdateInstitutionDto): void {
       for (let property in data) {
         this[property] = data[property];
       }
-    }
-  
-    removeSensibleData(): void {
-      delete this.password;
-      delete this.paid;
-      
     }
   
     async comparePassword(password: string): Promise<boolean> {

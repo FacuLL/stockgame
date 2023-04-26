@@ -1,28 +1,46 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasicUser } from 'src/basicuser/entities/basicuser.entity';
 import { Repository } from 'typeorm';
-import { UserLoginDto } from './dto/userlogin.dto';
+import { BasicUserLoginDto } from './basicuser/userlogin.dto';
 import { JwtService } from '@nestjs/jwt';
+import { BasicUserRequest } from './basicuser/basicuser.request';
+import { JWTRequestContent } from './jwt/jwt.request';
+import { Institution } from 'src/institution/entities/institution.entity';
+import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
+import { InstitutionRequest } from './institution/institutuion.request';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(BasicUser) private readonly basicUserRepostory: Repository<BasicUser>,
+        @InjectRepository(Institution) private readonly institutionRepostory: Repository<Institution>,
         private jwtService: JwtService
     ) {}
 
-    async login(user: any) {
-        const payload = { username: user.username, sub: user.userId };
+    async loginInstitution(req: InstitutionRequest) {
+      const payload: JWTRequestContent = { userid: req.user.user.userid, type: "institution", entityid: req.user.institutionid };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
+    }
+
+    async validateInstitution(data: InstitutionLoginDto): Promise<Institution> {
+        const institution: Institution = await this.institutionRepostory.findOne({ where: { email: data.email } });
+        if (!await institution.comparePassword(data.password)) return null;
+        return institution;
+    }
+
+    async loginUser(req: BasicUserRequest) {
+        const payload: JWTRequestContent = { userid: req.user.user.userid, type: "basicuser", entityid: req.user.basicuserid };
         return {
           access_token: this.jwtService.sign(payload),
         };
-      }
+    }
 
-    async validateUser(data: UserLoginDto): Promise<BasicUser> {
-        const user: BasicUser = await this.basicUserRepostory.findOne({ where: { username: data.username } })
-        if (!await user.comparePassword(data.password)) return null
-        user.removeSensibleData();
+    async validateUser(data: BasicUserLoginDto): Promise<BasicUser> {
+        const user: BasicUser = await this.basicUserRepostory.findOne({ where: { username: data.username }, relations: ['user'] });
+        if (!await user.comparePassword(data.password)) return null;
         return user;
-      }
+    }
 }
