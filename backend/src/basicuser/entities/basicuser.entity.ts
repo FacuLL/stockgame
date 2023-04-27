@@ -13,6 +13,7 @@ import { User } from "src/user/entities/user.entity";
 import { CreateBasicuserDto } from "../dto/create-basicuser.dto";
 import { UpdateBasicuserDto } from "../dto/update-basicuser.dto";
 import { Institution } from 'src/institution/entities/institution.entity';
+import { fields } from 'src/constants/fields.constants';
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Index("bUser_user", ["userid"], {})
@@ -21,13 +22,13 @@ export class BasicUser {
   @PrimaryGeneratedColumn()
   basicuserid: number;
 
-  @Column({ length: 45, nullable: true })
+  @Column({ length: fields.email.max, nullable: true })
   email?: string;
 
-  @Column({ length: 60, select: false })
+  @Column({ length: fields.password.max, select: false })
   private password: string;
 
-  @Column({ primary: true, length: 45 })
+  @Column({ primary: true, length: fields.username.max, unique: true })
   username: string;
 
   @OneToOne(() => User, (user) => user.basicuser, {

@@ -1,42 +1,37 @@
-import {
+  import {
     Column,
     Entity,
     Index,
-    JoinTable,
-    ManyToMany,
-    ManyToOne,
     OneToMany,
-    OneToOne,
     PrimaryGeneratedColumn,
   } from "typeorm";
-  import { User } from "src/user/entities/user.entity";
-  import { Game } from "src/game/entities/game.entity";
-import { Institution } from "src/institution/entities/institution.entity";
+  import { Institution } from "src/institution/entities/institution.entity";
+  import { fields } from "src/constants/fields.constants";
   
   @Index("institutionid_UNIQUE", ["institutionid"], { unique: true })
   @Entity("institution", { schema: "marketgame" })
   export class Plan {
-    @PrimaryGeneratedColumn({ type: "int", name: "institutionid" })
+    @PrimaryGeneratedColumn()
     planid: number;
   
-    @Column("varchar", { name: "title", length: 45 })
+    @Column({ length: fields.title.max })
     title: string;
 
-    @Column("decimal", {
-        name: "quotation",
-        precision: 9,
-        scale: 2,
-        default: () => "'0.00'",
-    })
+    @Column({ precision: 9, scale: 2 })
     price: number;
   
-    
-  @Column("tinyint", { name: "paid", width: 1, default: () => "'0'" })
-    paid: boolean;
+    @Column()
+    accounts: number;
+
+    @Column()
+    courses: boolean;
 
     @OneToMany(() => Institution, (institution) => institution.plan)
     institutions: Institution[]
 
+    constructor() {
+
+    }
   }
   
 

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateInstitutionDto } from './dto/create-institution.dto';
 import { UpdateInstitutionDto } from './dto/update-institution.dto';
 import { generateHash } from 'src/utils/passwords';
@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { User } from 'src/user/entities/user.entity';
+import { JWTRequest } from 'src/auth/jwt/jwt.request';
+import { deleteEmptyFields } from 'src/utils/data-transform';
 
 @Injectable()
 export class InstitutionService {
@@ -16,7 +18,7 @@ export class InstitutionService {
     private dataSource: DataSource
   ) {}
 
-  async create(createUserDto: CreateUserDto, createInstitutionDto: CreateInstitutionDto) {
+  async create(createUserDto: CreateUserDto, createInstitutionDto: CreateInstitutionDto): Promise<HttpStatus> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -27,6 +29,7 @@ export class InstitutionService {
       await queryRunner.manager.save(user);
       await queryRunner.manager.save(institution);
       await queryRunner.commitTransaction();
+      return HttpStatus.OK;
     } catch (e) {
       await queryRunner.rollbackTransaction();
       throw new HttpException(e.message, e.status);
@@ -44,11 +47,19 @@ export class InstitutionService {
     return this.institutionRepostory.findOne({where: {institutionid: id}, relations: {user: true, users: true, games: true, ownergames: true}})
   }
 
-  update(req: Request, updateInstitutionDto: UpdateInstitutionDto) {
-    
+  async update(req: JWTRequest, updateInstitutionDto: UpdateInstitutionDto): Promise<HttpStatus> {
+    if (req.user.type != "institution") throw new UnauthorizedException();
+    let institution: Institution = await this.findOne(req.user.entityid);
+    if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
+    updateInstitutionDto = deleteEmptyFields(updateInstitutionDto);
+    institution.updateData(updateInstitutionDto);
+    return HttpStatus.OK;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} institution`;
+  async delete(id: number): Promise<HttpStatus> {
+    let institution: Institution = await this.institutionRepostory.findOne({ where: { institutionid: id } });
+    if (institution) throw new NotFoundException();
+    await this.institutionRepostory.delete(id);
+    return HttpStatus.OK;
   }
 }

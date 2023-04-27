@@ -9,12 +9,14 @@ import { JWTRequestContent } from './jwt/jwt.request';
 import { Institution } from 'src/institution/entities/institution.entity';
 import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
 import { InstitutionRequest } from './institution/institutuion.request';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
     constructor(
         @InjectRepository(BasicUser) private readonly basicUserRepostory: Repository<BasicUser>,
         @InjectRepository(Institution) private readonly institutionRepostory: Repository<Institution>,
+        @InjectRepository(User) private readonly userRepostory: Repository<User>,
         private jwtService: JwtService
     ) {}
 
@@ -42,5 +44,11 @@ export class AuthService {
         const user: BasicUser = await this.basicUserRepostory.findOne({ where: { username: data.username }, relations: ['user'] });
         if (!await user.comparePassword(data.password)) return null;
         return user;
+    }
+
+    async validateAdmin(userid: number): Promise<Boolean> {
+      const user: User = await this.userRepostory.findOne({ where: { userid: userid } });
+      if (user.type != "admin") return false;
+      return true;
     }
 }

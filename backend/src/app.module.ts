@@ -12,8 +12,9 @@ import { PlanModule } from './plan/plan.module';
 import { ProviderModule } from './provider/provider.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt/jwt-auth.guard';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 @Module({
   imports: [
@@ -34,6 +35,9 @@ import { JwtAuthGuard } from './auth/jwt/jwt-auth.guard';
   providers: [AppService, {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+  }, {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
   }
   ],
 })
