@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasicUser } from 'src/basicuser/entities/basicuser.entity';
+import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
 import { Repository } from 'typeorm';
 import { BasicUserLoginDto } from './basicuser/userlogin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { BasicUserRequest } from './basicuser/basicuser.request';
 import { JWTRequestContent } from './jwt/jwt.request';
-import { Institution } from 'src/institution/entities/institution.entity';
+import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
 import { InstitutionRequest } from './institution/institutuion.request';
-import { User } from 'src/user/entities/user.entity';
+import { User } from 'src/entities/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {

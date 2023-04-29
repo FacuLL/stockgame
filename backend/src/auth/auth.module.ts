@@ -6,9 +6,9 @@ import { PassportModule } from '@nestjs/passport';
 import { BasicUserStrategy } from './basicuser/basicuser.strategy';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BasicUser } from 'src/basicuser/entities/basicuser.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Institution } from 'src/institution/entities/institution.entity';
+import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
+import { User } from 'src/entities/user/entities/user.entity';
+import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionStrategy } from './institution/institution.strategy';
 import { AdminStrategy } from './admin/admin.strategy';
 
