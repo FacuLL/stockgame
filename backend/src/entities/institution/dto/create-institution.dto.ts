@@ -10,7 +10,7 @@ export class CreateInstitutionDto {
     @Length(fields.email.min, fields.email.max)
     email?: string
     @IsNotEmpty()
-    @IsStrongPassword({ minLength: fields.password.min })
+    @IsStrongPassword({ minLength: fields.password.min, minSymbols: 0, minUppercase: 1, minLowercase: 1, minNumbers: 1 })
     @MaxLength(fields.password.max)
     password: string
 }

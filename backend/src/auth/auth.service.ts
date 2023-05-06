@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { BasicUserLoginDto } from './basicuser/userlogin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { BasicUserRequest } from './basicuser/basicuser.request';
 import { JWTRequestContent } from './jwt/jwt.request';
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
-import { InstitutionRequest } from './institution/institutuion.request';
+import { InstitutionRequest } from './institution/institution.request';
 import { User } from 'src/entities/user/entities/user.entity';
 
 @Injectable()
@@ -41,8 +41,9 @@ export class AuthService {
     }
 
     async validateUser(data: BasicUserLoginDto): Promise<BasicUser> {
-        const user: BasicUser = await this.basicUserRepostory.findOne({ where: { username: data.username }, relations: ['user'] });
-        if (!await user.comparePassword(data.password)) return null;
+        let options: FindOneOptions = { where: { username: data.username }, relations: ['user'], select: ['basicuserid', 'username', 'password'] };
+        const user: BasicUser = await this.basicUserRepostory.findOne(options);
+        if (!user || !await user.comparePassword(data.password)) return null;
         return user;
     }
 

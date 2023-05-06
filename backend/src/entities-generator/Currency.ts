@@ -4,7 +4,7 @@ import { Historicalcurrency } from "./Historicalcurrency";
 
 @Index("code_UNIQUE", ["code"], { unique: true })
 @Entity("currency", { schema: "marketgame" })
-export class Currency {
+export class Currency2 {
   @Column("varchar", { primary: true, name: "code", length: 4 })
   code: string;
 

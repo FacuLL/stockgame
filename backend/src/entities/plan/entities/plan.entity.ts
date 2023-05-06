@@ -10,8 +10,8 @@
 import { CreatePlanDto } from "../dto/create-plan.dto";
 import { UpdatePlanDto } from "../dto/update-plan.dto";
   
-  @Index("institutionid_UNIQUE", ["institutionid"], { unique: true })
-  @Entity("institution", { schema: "marketgame" })
+  @Index("planid_UNIQUE", ["planid"], { unique: true })
+  @Entity("plan", { schema: "marketgame" })
   export class Plan {
     @PrimaryGeneratedColumn()
     planid: number;

@@ -10,6 +10,8 @@ import { generateHash } from 'src/utils/passwords';
 import { FindBasicuserDto } from './dto/find-basicuser.dto';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { deleteEmptyFields } from 'src/utils/data-transform';
+import { USER_TYPE } from 'src/types/users.type';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()
 export class BasicuserService {
@@ -24,7 +26,7 @@ export class BasicuserService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      let user: User = new User(createUserDto, "basicuser");
+      let user: User = new User(createUserDto, USER_TYPE.BASICUSER);
       createBasicuserDto.password = await generateHash(createBasicuserDto.password);
       let basicuser: BasicUser = new BasicUser(createBasicuserDto, user);
       await queryRunner.manager.save(user);
@@ -39,12 +41,15 @@ export class BasicuserService {
     }
   }
 
-  async update(req: JWTRequest, updateBasicuserDto: UpdateBasicuserDto): Promise<HttpStatus> {
-    if (req.user.type != "basicuser") throw new UnauthorizedException();
+  async update(req: JWTRequest, updateBasicuserDto: UpdateBasicuserDto, updateUserDto: UpdateUserDto): Promise<HttpStatus> {
+    if (req.user.type != USER_TYPE.BASICUSER) throw new UnauthorizedException();
     let basicuser: BasicUser = await this.findOne(req.user.entityid);
     if (!basicuser || basicuser.user.userid != req.user.userid) throw new UnauthorizedException();
     updateBasicuserDto = deleteEmptyFields(updateBasicuserDto);
+    updateUserDto = deleteEmptyFields(updateUserDto);
     basicuser.updateData(updateBasicuserDto);
+    basicuser.user.updateData(updateUserDto);
+    this.basicUserRepostory.save(basicuser);
     return HttpStatus.OK;
   }
 
@@ -56,7 +61,7 @@ export class BasicuserService {
   }
 
   findOne(id: number): Promise<BasicUser> {
-    return this.basicUserRepostory.findOne({ where: { basicuserid: id }, relations: { user: true } });
+    return this.basicUserRepostory.findOne({ where: { basicuserid: id }, relations: { user: true, institution: true } });
   }
 
   async delete(id: number): Promise<HttpStatus> {

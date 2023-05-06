@@ -1,44 +1,26 @@
-import { Column, Entity, Index, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
-import { Game } from "src/entities/game/entities/game.entity";
-import { fields } from "src/constants/fields.constants";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Asset } from "src/entities/asset/entities/asset.entity";
+import { CreateShareDto } from "../dto/create-share.dto";
+import { Currency } from "src/entities-generator/Currency";
 
-@Index("code_UNIQUE", ["code"], { unique: true })
+@Index("shareid_UNIQUE", ["shareid"], { unique: true })
 @Entity("share", { schema: "marketgame" })
 export class Share {
-  @PrimaryColumn({ length: 10 })
-  code: string;
+  @PrimaryGeneratedColumn()
+  shareid: number;
 
-  @Column({ length: fields.name.max })
-  name: string;
+  @OneToOne(() => Asset)
+  @JoinColumn()
+  asset: Asset;
 
-  @Column("decimal", { precision: 9, scale: 2, })
-  quotation: number;
+  @ManyToOne(() => Currency)
+  @JoinColumn()
+  currency: Currency;
 
-  @Column()
-  automatized: boolean;
-
-  // @Column("varchar", { name: "currency", length: 3, default: () => "'ars'" })
-  // currency: string;
-
-  @Column("varchar", { nullable: true })
-  image?: string;
-
-  @Column()
-  available: boolean;
-
-  @Column({ precision: 9, scale: 2 })
-  dayhigh: string;
-
-  @Column({ precision: 9, scale: 2 })
-  daylow: string;
-
-  @Column({ type: 'timestamptz' })
-  lastupdate: Date;
-
-  // @OneToMany(() => Historicalshare, (historicalshare) => historicalshare.sharecode2)
-  // historicalshares: Historicalshare[];
-
-  @ManyToMany(() => Game)
-  @JoinTable()
-  games: Game[];
+  constructor(data: CreateShareDto, asset: Asset, currency: Currency) {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+    this.asset = asset;
+  }
 }

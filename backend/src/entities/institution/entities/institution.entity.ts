@@ -16,6 +16,8 @@ import { Plan } from "src/entities/plan/entities/plan.entity";
 import { CreateInstitutionDto } from "../dto/create-institution.dto";
 import { UpdateInstitutionDto } from "../dto/update-institution.dto";
 import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
+import { fields } from 'src/constants/fields.constants';
+import { InstitutionToGame } from 'src/relations/entities/institution-game.entity';
   
   @Index("institutionid_UNIQUE", ["institutionid"], { unique: true })
   @Entity("institution", { schema: "marketgame" })
@@ -23,27 +25,29 @@ import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
     @PrimaryGeneratedColumn()
     institutionid: number;
   
-    @Column({ length: 45 })
+    @Column({ length: fields.name.max })
     name: string;
 
-    @Column({ length: 45, nullable: true })
+    @Column({ length: fields.email.max, nullable: true })
     email?: string;
 
-    @Column({ length: 60, select: false })
+    @Column({ length: 72, select: false })
     private password: string;
   
-    @Column({ width: 1, select: false })
+    @Column({ default: false, select: false })
     paid: boolean;
 
     @ManyToOne(() => Plan, (plan) => plan.institutions)
     @JoinTable()
     plan: Plan;
 
-    @ManyToMany(() => Game, (game) => game.institutions)
-    @JoinTable()
+    @OneToMany(() => InstitutionToGame, (institutiongame) => institutiongame.institution)
     games: Game[];
 
-    @OneToOne(() => User, (user) => user.institution)
+    @OneToOne(() => User, (user) => user.institution, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE"
+    })
     @JoinTable()
     user: User;
 

@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateGameDto } from './create-game.dto';
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsDecimal, IsNotEmpty, IsOptional, Length } from "class-validator";
+import { IsBoolean, IsDate, IsDecimal, IsInt, IsNotEmpty, IsOptional, Length } from "class-validator";
 import { fields } from "src/constants/fields.constants";
 
 export class UpdateGameDto extends PartialType(CreateGameDto) {

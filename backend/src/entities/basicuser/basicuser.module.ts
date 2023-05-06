@@ -7,6 +7,7 @@ import { BasicUser } from './entities/basicuser.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([BasicUser])],
   controllers: [BasicuserController],
-  providers: [BasicuserService]
+  providers: [BasicuserService],
+  exports: [BasicuserService]
 })
 export class BasicuserModule {}

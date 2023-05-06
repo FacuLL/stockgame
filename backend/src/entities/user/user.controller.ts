@@ -1,34 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Request, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { JWTRequest } from 'src/auth/jwt/jwt.request';
+import { User } from './entities/user.entity';
+import { BasicUser } from '../basicuser/entities/basicuser.entity';
+import { Institution } from '../institution/entities/institution.entity';
+import { FindUserDto } from './dto/find-user.dto';
+import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
+  @UseGuards(AdminAuthGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() params: FindUserDto): Promise<User[]> {
+    return this.userService.findAll(params);
   }
 
+  @Get('profile')
+  getProfile(@Request() req: JWTRequest): Promise<User | BasicUser | Institution> {
+    return this.userService.getProfile(req);
+  }
+
+  @UseGuards(AdminAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Delete('')
+  deleteAccount(@Request() req: JWTRequest) {
+    return this.userService.deleteAccount(req);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  delete(@Param('id') id: string) {
+    return this.userService.delete(+id);
   }
 }

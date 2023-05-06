@@ -13,7 +13,7 @@ export class UpdateBasicuserDto extends PartialType(CreateBasicuserDto) {
     oldpassword?: string
     @IsOptional()
     @IsNotEmpty()
-    @IsStrongPassword()
+    @IsStrongPassword({ minLength: fields.password.max, minSymbols: 0, minUppercase: 1, minLowercase: 1, minNumbers: 1 })
     @MaxLength(fields.password.max)
     newpassword?: string
     @IsOptional()

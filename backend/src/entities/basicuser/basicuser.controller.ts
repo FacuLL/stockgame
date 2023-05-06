@@ -8,6 +8,7 @@ import { BasicUser } from './entities/basicuser.entity';
 import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { UpdateBasicuserDto } from './dto/update-basicuser.dto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Controller('basicuser')
 export class BasicuserController {
@@ -20,8 +21,8 @@ export class BasicuserController {
   }
 
   @Patch('')
-  update(@Request() req: JWTRequest, @Body() updateBasicUserDto: UpdateBasicuserDto): Promise<HttpStatus> {
-    return this.basicuserService.update(req, updateBasicUserDto);
+  update(@Request() req: JWTRequest, @Body() updateBasicUserDto: UpdateBasicuserDto, @Body() updateUserDto: UpdateUserDto): Promise<HttpStatus> {
+    return this.basicuserService.update(req, updateBasicUserDto, updateUserDto);
   }
 
   @UseGuards(AdminAuthGuard)

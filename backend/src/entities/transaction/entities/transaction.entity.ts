@@ -1,71 +1,57 @@
+import { Currency } from "src/entities-generator/Currency";
+import { Asset } from "src/entities/asset/entities/asset.entity";
+import { UserToGame } from "src/relations/entities/user-game.entity";
+import { ActionType } from "src/types/actions.type";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { CreateTransactionDto } from "../dto/create-transaction.dto";
 
-@Index("transid_UNIQUE", ["transid"], { unique: true })
-@Index("trans_user_idx", ["instanceid"], {})
-@Index("trans_currency_idx", ["currencycode"], {})
-@Index("trans_share_idx", ["sharecode"], {})
+@Index("transactionid_UNIQUE", ["transactionid"], { unique: true })
 @Entity("transaction", { schema: "marketgame" })
 export class Transaction {
-  @PrimaryGeneratedColumn({ type: "int", name: "transid" })
-  transid: number;
+  @PrimaryGeneratedColumn()
+  transactionid: number;
 
-  @Column("int", { name: "instanceid" })
-  instanceid: number;
-
-  @Column("varchar", { name: "sharecode", length: 10 })
-  sharecode: string;
-
-  @Column("datetime", { name: "date" })
+  @CreateDateColumn()
   date: Date;
 
-  @Column("decimal", {
-    name: "quotation",
-    precision: 9,
-    scale: 2,
-    default: () => "'0.00'",
-  })
-  quotation: string;
+  @Column("decimal", { precision: 9, scale: 2 })
+  quotation: number;
 
-  @Column("varchar", { name: "action", length: 4, default: () => "'buy'" })
-  action: string;
+  @Column("varchar")
+  action: ActionType;
 
-  @Column("varchar", {
-    name: "currencycode",
-    length: 3,
-    default: () => "'ARS'",
-  })
-  currencycode: string;
-
-  @Column("int", { name: "amount", default: () => "'1'" })
+  @Column()
   amount: number;
 
-  // @ManyToOne(
-  //   () => Currencyingame,
-  //   (currencyingame) => currencyingame.transactions,
-  //   { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  // )
-  // @JoinColumn([{ name: "currencycode", referencedColumnName: "currencycode" }])
-  // currencycode2: Currencyingame;
+  @ManyToOne(() => Asset)
+  @JoinColumn()
+  asset: Asset;
 
-  // @ManyToOne(
-  //   () => Gameparticipants,
-  //   (gameparticipants) => gameparticipants.transactions,
-  //   { onDelete: "NO ACTION", onUpdate: "NO ACTION" }
-  // )
-  // @JoinColumn([{ name: "instanceid", referencedColumnName: "instanceid" }])
-  // instance: Gameparticipants;
+  @ManyToOne(() => Currency)
+  @JoinColumn()
+  currency: Currency;
 
-  // @ManyToOne(() => Shareingame, (shareingame) => shareingame.transactions, {
-  //   onDelete: "NO ACTION",
-  //   onUpdate: "NO ACTION",
-  // })
-  // @JoinColumn([{ name: "sharecode", referencedColumnName: "sharecode" }])
-  // sharecode2: Shareingame;
+  @ManyToOne(() => UserToGame, (usergame) => usergame.transactions)
+  @JoinColumn()
+  instance: UserToGame;
+
+  constructor(data: CreateTransactionDto, asset: Asset, currency: Currency, instance: UserToGame) {
+    for (let property in data) {
+      this[property] = data[property];
+    }
+    this.asset = asset;
+    this.currency = currency;
+    this.instance = instance;
+    this.date = new Date();
+    this.quotation = this.asset.quotation;
+    this.currency = currency;
+  }
 }

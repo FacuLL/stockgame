@@ -3,7 +3,8 @@ import { AuthService } from './auth.service';
 import { BasicUserAuthGuard } from './basicuser/basicuser.guard';
 import { Public } from './public/public.decorator';
 import { BasicUserRequest } from './basicuser/basicuser.request';
-import { InstitutionRequest } from './institution/institutuion.request';
+import { InstitutionRequest } from './institution/institution.request';
+import { InstitutionAuthGuard } from './institution/institution.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +19,7 @@ export class AuthController {
     }
 
     @Public()
-    @UseGuards(BasicUserAuthGuard)
+    @UseGuards(InstitutionAuthGuard)
     @Post('login/institution')
     institutionLogin(@Request() req: InstitutionRequest) {
         return this.authService.loginInstitution(req);

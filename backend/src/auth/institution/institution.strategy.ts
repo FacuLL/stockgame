@@ -6,7 +6,7 @@ import { Institution } from 'src/entities/institution/entities/institution.entit
 import { InstitutionLoginDto } from './insitutionlogin.dto';
 
 @Injectable()
-export class InstitutionStrategy extends PassportStrategy(Strategy) {
+export class InstitutionStrategy extends PassportStrategy(Strategy, 'institution') {
   constructor(private authService: AuthService) {
     super();
   }

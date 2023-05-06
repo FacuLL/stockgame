@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   Index,
+  ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -10,30 +12,40 @@ import { BasicUser } from "src/entities/basicuser/entities/basicuser.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { UserType } from "src/types/users.type";
+import { UserToGame } from "src/relations/entities/user-game.entity";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Entity("user", { schema: "marketgame" })
 export class User {
-  @PrimaryGeneratedColumn({ type: "int", name: "userid" })
+  @PrimaryGeneratedColumn()
   userid: number;
 
-  @Column("varchar", { name: "name", length: 45 })
+  @Column({ length: 45 })
   name: string;
 
-  @Column("varchar", { name: "image", nullable: true, length: 45 })
-  image: string | null;
+  @Column({ nullable: true })
+  image?: string;
 
-  @Column("tinyint", { name: "publicprofile", width: 1, default: () => "'0'" })
+  @Column({ default: false })
   publicprofile: boolean;
 
-  @Column("varchar", {length: 15})
+  @Column("varchar")
   type: UserType;
 
-  @OneToOne(() => Institution, (institution) => institution.user)
+  @OneToOne(() => Institution, (institution) => institution.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  })
   institution: Institution;
 
-  @OneToOne(() => BasicUser, (basicuser) => basicuser.user)
+  @OneToOne(() => BasicUser, (basicuser) => basicuser.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  })
   basicuser: BasicUser;
+
+  @OneToMany(() => UserToGame, (usertogame) => usertogame.user)
+  games: UserToGame[];
 
   constructor(data: CreateUserDto, type: UserType) {
     for (let property in data) {

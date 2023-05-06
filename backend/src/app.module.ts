@@ -15,6 +15,9 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt/jwt-auth.guard';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { AssetModule } from './entities/asset/asset.module';
+import { RelationsModule } from './relations/relations.module';
+import { CurrencyModule } from './entities/currency/currency.module';
 
 @Module({
   imports: [
@@ -25,11 +28,13 @@ import { HttpExceptionFilter } from './filters/http-exception.filter';
       username: 'root',
       password: 'facu',
       database: 'marketgame',
-      entities: [],
-      synchronize: true,
+      entities: [
+        "dist/entities/**/entities/**.entity{.ts,.js}"
+      ],
+      synchronize: true
     }),
     ConfigModule.forRoot(),
-    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule
+    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule, AssetModule, RelationsModule, CurrencyModule
   ],
   controllers: [AppController],
   providers: [AppService, {

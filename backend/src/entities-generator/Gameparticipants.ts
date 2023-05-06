@@ -13,7 +13,7 @@ import { Currencystock } from "./Currencystock";
 import { Currencytransaction } from "./Currencytransaction";
 import { Game } from "./Game";
 import { User } from "../user/entities/user.entity";
-import { Sharestock } from "./Sharestock";
+import { Sharestock } from "./Sharestock"; 
 import { Transaction } from "../transaction/entities/transaction.entity";
 
 @Index("instanceid_UNIQUE", ["instanceid"], { unique: true })

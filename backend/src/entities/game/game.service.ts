@@ -7,39 +7,46 @@ import { Institution } from 'src/entities/institution/entities/institution.entit
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FindGameDto } from './dto/find-game.dto';
+import { USER_TYPE } from 'src/types/users.type';
+import { Currency } from '../currency/entities/currency.entity';
 
 @Injectable()
 export class GameService {
   constructor(
     @InjectRepository(Game) private readonly gameRepostory: Repository<Game>,
     @InjectRepository(Institution) private readonly institutionRepostory: Repository<Institution>,
+    @InjectRepository(Currency) private readonly currencyRepostory: Repository<Currency>
   ) {}
 
   async createInstitutionGame(req: JWTRequest, createGameDto: CreateGameDto): Promise<HttpStatus> {
-    if (req.user.type != "institution") throw new UnauthorizedException();
+    if (req.user.type != USER_TYPE.INSTITUTION) throw new UnauthorizedException();
     let institution: Institution = await this.institutionRepostory.findOne({ where: { institutionid: req.user.entityid }, relations: { user: true } });
     if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
-    let game: Game = new Game(createGameDto, false, institution);
+    let currency: Currency = await this.currencyRepostory.findOne({ where: { currencyid: createGameDto.currencyid } });
+    if (!currency) throw new NotFoundException();
+    let game: Game = new Game(createGameDto, false, currency, institution);
     await this.gameRepostory.save(game);
     return HttpStatus.OK;
   }
 
   async createGlobalGame(createGameDto: CreateGameDto): Promise<HttpStatus> {
-    let game: Game = new Game(createGameDto, true);
+    let currency: Currency = await this.currencyRepostory.findOne({ where: { currencyid: createGameDto.currencyid } });
+    if (!currency) throw new NotFoundException();
+    let game: Game = new Game(createGameDto, true, currency);
     await this.gameRepostory.save(game);
     return HttpStatus.OK;
   }
 
   findAll(params: FindGameDto): Promise<Game[]> {
-    return this.gameRepostory.find({ where: { ...params }, relations: { institutions: true, owner: true, shares: true } })
+    return this.gameRepostory.find({ where: { ...params }, relations: { institutions: true, owner: true, assets: true } })
   }
 
   findOne(id: number): Promise<Game> {
-    return this.gameRepostory.findOne({ where: { gameid: id }, relations: { institutions: true, owner: true, shares: true } });
+    return this.gameRepostory.findOne({ where: { gameid: id }, relations: { institutions: true, owner: true, assets: true } });
   }
 
   async updateInstitutionGame(req: JWTRequest, id: number, updateGameDto: UpdateGameDto): Promise<HttpStatus> {
-    if (req.user.type != "institution") throw new UnauthorizedException();
+    if (req.user.type != USER_TYPE.INSTITUTION) throw new UnauthorizedException();
     let institution: Institution = await this.institutionRepostory.findOne({ where: { institutionid: req.user.entityid }, relations: { user: true } });
     if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
     let game: Game = await this.gameRepostory.findOne({ where: { gameid: id }, relations: { owner: true } });
@@ -69,7 +76,7 @@ export class GameService {
   }
 
   async deleteInstitutionGame(req: JWTRequest, id: number): Promise<HttpStatus> {
-    if (req.user.type != "institution") throw new UnauthorizedException();
+    if (req.user.type != USER_TYPE.INSTITUTION) throw new UnauthorizedException();
     let institution: Institution = await this.institutionRepostory.findOne({ where: { institutionid: req.user.entityid }, relations: { user: true } });
     if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
     let game: Game = await this.findOne(id);

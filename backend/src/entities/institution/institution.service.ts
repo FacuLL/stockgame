@@ -9,6 +9,7 @@ import { CreateUserDto } from 'src/entities/user/dto/create-user.dto';
 import { User } from 'src/entities/user/entities/user.entity';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { deleteEmptyFields } from 'src/utils/data-transform';
+import { USER_TYPE } from 'src/types/users.type';
 
 @Injectable()
 export class InstitutionService {
@@ -23,7 +24,7 @@ export class InstitutionService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      let user: User = new User(createUserDto, "institution");
+      let user: User = new User(createUserDto, USER_TYPE.INSTITUTION);
       createInstitutionDto.password = await generateHash(createInstitutionDto.password);
       let institution: Institution = new Institution(createInstitutionDto, user);
       await queryRunner.manager.save(user);
@@ -43,12 +44,13 @@ export class InstitutionService {
     return this.institutionRepostory.find(options);
   }
 
-  findOne(id: number): Promise<Institution> {
-    return this.institutionRepostory.findOne({where: {institutionid: id}, relations: {user: true, users: true, games: true, ownergames: true}})
+  findOne(id: number, admin?: boolean): Promise<Institution> {
+    if (!admin) admin = false;
+    return this.institutionRepostory.findOne({where: {institutionid: id}, relations: {user: true, users: true, games: true, ownergames: true, plan: true}});
   }
 
   async update(req: JWTRequest, updateInstitutionDto: UpdateInstitutionDto): Promise<HttpStatus> {
-    if (req.user.type != "institution") throw new UnauthorizedException();
+    if (req.user.type != USER_TYPE.INSTITUTION) throw new UnauthorizedException();
     let institution: Institution = await this.findOne(req.user.entityid);
     if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
     updateInstitutionDto = deleteEmptyFields(updateInstitutionDto);

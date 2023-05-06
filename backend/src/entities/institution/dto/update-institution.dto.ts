@@ -18,7 +18,7 @@ export class UpdateInstitutionDto extends PartialType(CreateInstitutionDto) {
     oldpassword: string
     @IsOptional()
     @IsNotEmpty()
-    @IsStrongPassword({ minLength: fields.password.min })
+    @IsStrongPassword({ minLength: fields.password.min, minSymbols: 0, minUppercase: 1, minLowercase: 1, minNumbers: 1 })
     @MaxLength(fields.password.max)
     newpassword: string
 }
