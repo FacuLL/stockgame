@@ -8,6 +8,8 @@ import {
     PrimaryGeneratedColumn,
   } from "typeorm";
 import { UserToGame } from "./user-game.entity";
+import { ActionType } from "src/types/actions.type";
+import { ConflictException } from "@nestjs/common";
   
   @Index("assetuserid_UNIQUE", ["assetuserid"], { unique: true })
   @Entity("asset_user", { schema: "marketgame" })
@@ -33,6 +35,12 @@ import { UserToGame } from "./user-game.entity";
     constructor (instance: UserToGame, asset: Asset) {
       this.instance = instance;
       this.asset = asset;
+    }
+
+    changeStock(action: ActionType, amount: number) {
+      if (action == "sell" && (this.stock < amount)) throw new ConflictException("Not enough stock");
+      let operation: number = action == "buy" ? +amount : -amount;
+      this.stock+=operation;
     }
   }
   

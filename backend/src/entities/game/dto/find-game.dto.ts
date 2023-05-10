@@ -16,4 +16,6 @@ export class FindGameDto extends PartialType(CreateGameDto) {
     @IsOptional()
     @IsBoolean()
     finished: boolean
+    @IsOptional()
+    currencysimbol: string
 }

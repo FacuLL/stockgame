@@ -60,12 +60,6 @@ export class User {
     }
   }
 
-  // @Column("tinyint", { name: "team", width: 1, default: () => "'0'" })
-  // isTeam: boolean;
-
-  // @OneToMany(() => Team, (team) => team.creator)
-  // teams: Team[];
-
   // @OneToOne(() => Team, (team) => team.user)
   // team2: Team;
 }

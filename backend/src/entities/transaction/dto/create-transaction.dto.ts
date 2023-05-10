@@ -5,6 +5,9 @@ export class CreateTransactionDto {
     @IsInt()
     @IsNotEmpty()
     assetid: number
+    @IsInt()
+    @IsNotEmpty()
+    gameid: number
     @IsNotEmpty()
     action: ActionType
     @IsInt()

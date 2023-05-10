@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { FindGameDto } from './dto/find-game.dto';
 import { USER_TYPE } from 'src/types/users.type';
 import { Currency } from '../currency/entities/currency.entity';
+import { deleteEmptyFields } from 'src/utils/data-transform';
 
 @Injectable()
 export class GameService {
@@ -51,6 +52,7 @@ export class GameService {
     if (!institution || institution.user.userid != req.user.userid) throw new UnauthorizedException();
     let game: Game = await this.gameRepostory.findOne({ where: { gameid: id }, relations: { owner: true } });
     if (!game || game.owner.institutionid != institution.institutionid) throw new UnauthorizedException();
+    updateGameDto = deleteEmptyFields(updateGameDto);
     game.updateData(updateGameDto);
     await this.gameRepostory.save(game);
     return HttpStatus.OK;

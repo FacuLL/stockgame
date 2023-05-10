@@ -1,34 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { AssetService } from './asset.service';
-import { CreateAssetDto } from './dto/create-asset.dto';
-import { UpdateAssetDto } from './dto/update-asset.dto';
+import { FindAssetDto } from './dto/find-asset-dto';
+import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
 
 @Controller('asset')
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
-  @Post()
-  create(@Body() createAssetDto: CreateAssetDto) {
-    return this.assetService.create(createAssetDto);
-  }
-
+  @UseGuards(AdminAuthGuard)
   @Get()
-  findAll() {
-    return this.assetService.findAll();
+  findAll(@Query() params: FindAssetDto) {
+    return this.assetService.findAll(params);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.assetService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAssetDto: UpdateAssetDto) {
-    return this.assetService.update(+id, updateAssetDto);
-  }
-
+  @UseGuards(AdminAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.assetService.remove(+id);
+    return this.assetService.delete(+id);
   }
 }

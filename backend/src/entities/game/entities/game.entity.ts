@@ -9,7 +9,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Share } from "src/entities/share/entities/share.entity";
 import { Institution } from "src/entities/institution/entities/institution.entity";
 import { CreateGameDto } from "../dto/create-game.dto";
 import { fields } from "src/constants/fields.constants";
@@ -18,7 +17,7 @@ import { UpdateGameDto } from "../dto/update-game.dto";
 import { UserToGame } from "src/relations/entities/user-game.entity";
 import { InstitutionToGame } from "src/relations/entities/institution-game.entity";
 import { AssetToGame } from "src/relations/entities/asset-game.entity";
-import { Currency } from "src/entities-generator/Currency";
+import { Currency } from "src/entities/currency/entities/currency.entity";
 
 @Index("gameid_UNIQUE", ["gameid"], { unique: true })
 @Entity("game", { schema: "marketgame" })
@@ -44,6 +43,9 @@ export class Game {
   @Column()
   global: boolean;
 
+  @Column({ nullable: true })
+  currencysimbol?: string;
+
   @ManyToOne(() => Institution, (institution) => institution.ownergames)
   @JoinColumn()
   owner?: Institution;
@@ -56,7 +58,7 @@ export class Game {
   assets: AssetToGame[];
 
   @OneToMany(() => InstitutionToGame, (institutiongame) => institutiongame.institution)
-  institutions?: Institution[];
+  institutions?: InstitutionToGame[];
 
   @OneToMany(() => UserToGame, (usertogame) => usertogame.game)
   users: UserToGame[];
@@ -68,7 +70,7 @@ export class Game {
       }
       if (!global && !institution) throw new BadRequestException();
       else if (!global && institution) {
-        this.institutions = [institution];
+        this.institutions = [new InstitutionToGame(institution, this)];
         this.owner = institution;
       }
       this.startDate = new Date();

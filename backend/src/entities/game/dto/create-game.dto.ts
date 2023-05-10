@@ -17,4 +17,7 @@ export class CreateGameDto {
     @IsNotEmpty()
     @IsInt()
     currencyid: number
+    @IsOptional()
+    @IsNotEmpty()
+    currencysimbol: string
 }

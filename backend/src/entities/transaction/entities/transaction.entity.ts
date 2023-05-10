@@ -1,4 +1,3 @@
-import { Currency } from "src/entities-generator/Currency";
 import { Asset } from "src/entities/asset/entities/asset.entity";
 import { UserToGame } from "src/relations/entities/user-game.entity";
 import { ActionType } from "src/types/actions.type";
@@ -12,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { CreateTransactionDto } from "../dto/create-transaction.dto";
+import { Currency } from "src/entities/currency/entities/currency.entity";
 
 @Index("transactionid_UNIQUE", ["transactionid"], { unique: true })
 @Entity("transaction", { schema: "marketgame" })
@@ -43,15 +43,14 @@ export class Transaction {
   @JoinColumn()
   instance: UserToGame;
 
-  constructor(data: CreateTransactionDto, asset: Asset, currency: Currency, instance: UserToGame) {
+  constructor(data: CreateTransactionDto, asset: Asset, instance: UserToGame) {
     for (let property in data) {
       this[property] = data[property];
     }
     this.asset = asset;
-    this.currency = currency;
+    this.currency = asset.currency;
     this.instance = instance;
     this.date = new Date();
     this.quotation = this.asset.quotation;
-    this.currency = currency;
   }
 }

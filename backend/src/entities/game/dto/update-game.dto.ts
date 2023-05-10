@@ -20,4 +20,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
     @IsOptional()
     @IsBoolean()
     finished: boolean
+    @IsOptional()
+    @IsNotEmpty()
+    currencysimbol: string
 }

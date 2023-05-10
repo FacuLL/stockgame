@@ -1,1 +1,3 @@
-export class CreateCurrencyDto {}
+export class CreateCurrencyDto {
+    
+}

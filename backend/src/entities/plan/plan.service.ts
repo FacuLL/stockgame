@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Plan } from './entities/plan.entity';
 import { Repository } from 'typeorm';
 import { FindPlanDto } from './dto/find-plan.dto';
+import { deleteEmptyFields } from 'src/utils/data-transform';
 
 @Injectable()
 export class PlanService {
@@ -30,6 +31,7 @@ export class PlanService {
   async update(id: number, updatePlanDto: UpdatePlanDto): Promise<HttpStatus> {
     let plan: Plan = await this.findOne(id);
     if (!plan) throw new NotFoundException();
+    updatePlanDto = deleteEmptyFields(updatePlanDto);
     plan.updateData(updatePlanDto);
     await this.planRepostory.save(plan);
     return HttpStatus.OK;

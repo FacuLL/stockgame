@@ -35,7 +35,7 @@ export class BasicuserService {
       return HttpStatus.OK;
     } catch (e) {
       await queryRunner.rollbackTransaction();
-      throw new HttpException(e.message, e.status);
+      throw e;
     } finally {
       await queryRunner.release();
     }

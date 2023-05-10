@@ -1,12 +1,16 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Asset } from "src/entities/asset/entities/asset.entity";
 import { CreateCurrencyDto } from "../dto/create-currency.dto";
+import { UpdateCurrencyDto } from "../dto/update-currency.dto";
 
 @Index("currency_UNIQUE", ["currency"], { unique: true })
 @Entity("currency", { schema: "marketgame" })
 export class Currency {
   @PrimaryGeneratedColumn()
   currencyid: number;
+
+  @Column()
+  main: boolean;
 
   @OneToOne(() => Asset)
   @JoinColumn()
@@ -17,5 +21,11 @@ export class Currency {
       this[property] = data[property];
     }
     this.asset = asset;
+  }
+
+  updateData(data: UpdateCurrencyDto): void {
+    for (let property in data) {
+      this[property] = data[property];
+    }
   }
 }

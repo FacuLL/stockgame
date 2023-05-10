@@ -1,26 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAssetDto } from './dto/create-asset.dto';
-import { UpdateAssetDto } from './dto/update-asset.dto';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Asset } from './entities/asset.entity';
+import { Repository } from 'typeorm';
+import { FindAssetDto } from './dto/find-asset-dto';
 
 @Injectable()
 export class AssetService {
-  create(createAssetDto: CreateAssetDto) {
-    return 'This action adds a new asset';
+
+  constructor (
+    @InjectRepository(Asset) private readonly assetRepostory: Repository<Asset>
+  ) {}
+
+  findAll(params: FindAssetDto): Promise<Asset[]> {
+    return this.assetRepostory.find({ where: { ...params }, relations: { provider: true, games: true } });
   }
 
-  findAll() {
-    return `This action returns all asset`;
+  findOne(id: number): Promise<Asset> {
+    return this.assetRepostory.findOne({ where: { assetid: id }, relations: { provider: true, games: true } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} asset`;
-  }
-
-  update(id: number, updateAssetDto: UpdateAssetDto) {
-    return `This action updates a #${id} asset`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} asset`;
+  async delete(id: number): Promise<HttpStatus> {
+    let asset: Asset = await this.findOne(id);
+    if (!asset) throw new NotFoundException();
+    return HttpStatus.OK;
   }
 }
