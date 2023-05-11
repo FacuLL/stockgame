@@ -8,12 +8,11 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
   } from "typeorm";
-import { UserToGame } from "./user-game.entity";
 import { Institution } from "src/entities/institution/entities/institution.entity";
 import { Game } from "src/entities/game/entities/game.entity";
   
   @Index("institutiongameid_UNIQUE", ["institutiongameid"], { unique: true })
-  @Entity("institution-game", { schema: "marketgame" }) 
+  @Entity("institution_game", { schema: "marketgame" }) 
   export class InstitutionToGame {
     @PrimaryGeneratedColumn()
     institutiongameid: number;

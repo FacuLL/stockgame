@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   Index,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -13,6 +12,7 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { UserType } from "src/types/users.type";
 import { UserToGame } from "src/relations/entities/user-game.entity";
+import { Admin } from "src/entities/admin/entities/admin.entity";
 
 @Index("userid_UNIQUE", ["userid"], { unique: true })
 @Entity("user", { schema: "marketgame" })
@@ -33,16 +33,19 @@ export class User {
   type: UserType;
 
   @OneToOne(() => Institution, (institution) => institution.user, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    cascade: true
   })
   institution: Institution;
 
   @OneToOne(() => BasicUser, (basicuser) => basicuser.user, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
+    cascade: true
   })
   basicuser: BasicUser;
+
+  @OneToOne(() => Admin, (admin) => admin.user, {
+    cascade: true
+  })
+  admin: Admin;
 
   @OneToMany(() => UserToGame, (usertogame) => usertogame.user)
   games: UserToGame[];

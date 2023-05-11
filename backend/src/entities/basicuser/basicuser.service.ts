@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateBasicuserDto } from './dto/create-basicuser.dto';
 import { UpdateBasicuserDto } from './dto/update-basicuser.dto';
 import { User } from 'src/entities/user/entities/user.entity';

@@ -44,13 +44,15 @@ export class Transaction {
   instance: UserToGame;
 
   constructor(data: CreateTransactionDto, asset: Asset, instance: UserToGame) {
-    for (let property in data) {
-      this[property] = data[property];
+    if (data && asset && instance) {
+      for (let property in data) {
+        this[property] = data[property];
+      }
+      this.asset = asset;
+      this.currency = asset.currency;
+      this.instance = instance;
+      this.date = new Date();
+      this.quotation = this.asset.quotation;
     }
-    this.asset = asset;
-    this.currency = asset.currency;
-    this.instance = instance;
-    this.date = new Date();
-    this.quotation = this.asset.quotation;
   }
 }

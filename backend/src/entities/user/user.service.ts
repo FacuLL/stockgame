@@ -8,6 +8,9 @@ import { Institution } from '../institution/entities/institution.entity';
 import { BasicuserService } from '../basicuser/basicuser.service';
 import { InstitutionService } from '../institution/institution.service';
 import { FindUserDto } from './dto/find-user.dto';
+import { USER_TYPE } from 'src/types/users.type';
+import { Admin } from '../admin/entities/admin.entity';
+import { AdminService } from '../admin/admin.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +18,8 @@ export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepostory: Repository<User>,
     private basicuserService: BasicuserService,
-    private institutionService: InstitutionService
+    private institutionService: InstitutionService,
+    private adminService: AdminService
   ) {}
 
   findAll(params: FindUserDto): Promise<User[]> {
@@ -40,15 +44,19 @@ export class UserService {
     return HttpStatus.OK;
   }
 
-  async getProfile(req: JWTRequest): Promise<User | BasicUser | Institution> {
-    let entity: User | BasicUser | Institution;
+  async getProfile(req: JWTRequest): Promise<User | BasicUser | Institution | Admin> {
+    let entity: User | BasicUser | Institution | Admin;
     switch(req.user.type) {
-      case "basicuser":
+      case USER_TYPE.BASICUSER:
         entity = await this.basicuserService.findOne(req.user.entityid);
         if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
         break;
-      case "institution":
+      case USER_TYPE.INSTITUTION:
         entity = await this.institutionService.findOne(req.user.entityid);
+        if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
+        break;
+      case USER_TYPE.ADMIN:
+        entity = await this.adminService.findOne(req.user.entityid);
         if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
         break;
       default:

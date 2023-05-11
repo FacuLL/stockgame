@@ -4,7 +4,6 @@ import {
   Entity,
   Index,
   JoinColumn,
-  JoinTable,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -14,9 +13,9 @@ import { CreateBasicuserDto } from "../dto/create-basicuser.dto";
 import { UpdateBasicuserDto } from "../dto/update-basicuser.dto";
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { fields } from 'src/constants/fields.constants';
+import { USER_TYPE } from 'src/types/users.type';
 
-@Index("userid_UNIQUE", ["basicuserid"], { unique: true })
-@Index("bUser_user", ["basicuserid"], {})
+@Index("basicuserid_UNIQUE", ["basicuserid"], { unique: true })
 @Entity("basicuser", { schema: "marketgame" })
 export class BasicUser {
   @PrimaryGeneratedColumn()
@@ -32,15 +31,13 @@ export class BasicUser {
   username: string;
 
   @OneToOne(() => User, (user) => user.basicuser, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE"
+    cascade: true,
   })
   @JoinColumn()
   user: User;
 
   @ManyToOne(() => Institution, (institution) => institution.users, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+    cascade: true,
     nullable: true
   })
   @JoinColumn()
@@ -48,7 +45,7 @@ export class BasicUser {
 
   constructor(data: CreateBasicuserDto, user: User) {
     if (data) {
-      if (user?.type != "basicuser") throw new Error("User must be of type 'basicuser'");
+      if (user?.type != USER_TYPE.BASICUSER) throw new Error(`User must be of type '${USER_TYPE.BASICUSER}'`);
       for (let property in data) {
         this[property] = data[property];
       }

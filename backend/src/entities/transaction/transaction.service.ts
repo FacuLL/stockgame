@@ -7,6 +7,7 @@ import { FindTransactionDto } from './dto/find-transaction.dto';
 import { UserToGame } from 'src/relations/entities/user-game.entity';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { Asset } from '../asset/entities/asset.entity';
+import { USER_TYPE } from 'src/types/users.type';
 
 @Injectable()
 export class TransactionService {
@@ -19,7 +20,7 @@ export class TransactionService {
   ) {}
 
   async create(req: JWTRequest, createTransactionDto: CreateTransactionDto): Promise<HttpStatus> {
-    if (req.user.type != "basicuser") throw new UnauthorizedException();
+    if (req.user.type != USER_TYPE.BASICUSER) throw new UnauthorizedException();
     let instance: UserToGame = await this.instanceRepostory.findOne({ where: { user: { userid: req.user.userid }, game: { gameid: createTransactionDto.gameid } }, relations: { user: { basicuser: true }, game: true, assets: true } });
     if (!instance || !instance.user.basicuser || instance.user.basicuser.basicuserid != req.user.entityid) throw new UnauthorizedException();
     let asset: Asset = await this.assetRepostory.findOne({ where: { assetid: createTransactionDto.assetid }, relations: { currency: true } });

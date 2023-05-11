@@ -18,6 +18,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { AssetModule } from './entities/asset/asset.module';
 import { RelationsModule } from './relations/relations.module';
 import { CurrencyModule } from './entities/currency/currency.module';
+import { AdminModule } from './entities/admin/admin.module';
 
 @Module({
   imports: [
@@ -29,12 +30,13 @@ import { CurrencyModule } from './entities/currency/currency.module';
       password: 'facu',
       database: 'marketgame',
       entities: [
-        "dist/entities/**/entities/**.entity{.ts,.js}"
+        "dist/entities/**/entities/**.entity{.ts,.js}",
+        "dist/relations/entities/**.entity{.ts,.js}"
       ],
       synchronize: true
     }),
     ConfigModule.forRoot(),
-    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule, AssetModule, RelationsModule, CurrencyModule
+    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule, AssetModule, RelationsModule, CurrencyModule, AdminModule
   ],
   controllers: [AppController],
   providers: [AppService, {

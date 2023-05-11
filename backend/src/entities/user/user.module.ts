@@ -5,9 +5,10 @@ import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BasicuserModule } from '../basicuser/basicuser.module';
 import { InstitutionModule } from '../institution/institution.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), BasicuserModule, InstitutionModule],
+  imports: [TypeOrmModule.forFeature([User]), BasicuserModule, InstitutionModule, AdminModule],
   controllers: [UserController],
   providers: [UserService]
 })

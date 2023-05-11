@@ -6,7 +6,7 @@ import { CreateAssetDto } from "../dto/create-asset.dto";
 import { UpdateAssetDto } from "../dto/update-asset.dto";
 import { Currency } from "src/entities/currency/entities/currency.entity";
 
-@Index("code_UNIQUE", ["code"], { unique: true })
+@Index("assetid_UNIQUE", ["assetid"], { unique: true })
 @Entity("asset", { schema: "marketgame" })
 export class Asset {
   @PrimaryGeneratedColumn()
@@ -18,7 +18,7 @@ export class Asset {
   @Column({ length: fields.name.max })
   name: string;
 
-  @Column("decimal", { precision: 9, scale: 2, })
+  @Column("decimal", { precision: 9, scale: 2 })
   quotation: number;
 
   @Column()
@@ -42,13 +42,13 @@ export class Asset {
   @OneToMany(() => AssetToGame, (assetgame) => assetgame.asset)
   games: AssetToGame[];
 
-  @ManyToOne(() => Provider, (provider) => provider.assets)
-  @JoinColumn()
-  provider: Provider;
-
   @ManyToOne(() => Currency, { nullable: true })
   @JoinColumn()
   currency: Currency;
+
+  @ManyToOne(() => Provider, (provider) => provider.assets)
+  @JoinColumn()
+  provider: Provider;
 
   constructor(data: CreateAssetDto, provider: Provider, currency?: Currency) {
     for (let property in data) {

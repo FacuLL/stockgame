@@ -3,7 +3,7 @@ import { Asset } from "src/entities/asset/entities/asset.entity";
 import { CreateCurrencyDto } from "../dto/create-currency.dto";
 import { UpdateCurrencyDto } from "../dto/update-currency.dto";
 
-@Index("currency_UNIQUE", ["currency"], { unique: true })
+@Index("currencyid_UNIQUE", ["currencyid"], { unique: true })
 @Entity("currency", { schema: "marketgame" })
 export class Currency {
   @PrimaryGeneratedColumn()
