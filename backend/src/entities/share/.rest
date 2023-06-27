@@ -1,0 +1,34 @@
+// ADMIN: Create share
+POST http://localhost:3000/share
+content-type: application/json
+{
+    "code": "YPF.D",
+    "name": "YPF Sociedad Anonima",
+    "automatized": false,
+    "providerid": 1,
+    "currencyid": 1
+}
+
+###
+// ADMIN: Update share
+PATCH http://localhost:3000/share/1
+content-type: application/json
+{
+    "code": "YPF.D",
+    "name": "YPF Sociedad Anonima",
+    "automatized": false,
+    "providerid": 1,
+    "currencyid": 1
+}
+
+###
+// ADMIN: get all
+GET http://localhost:3000/share
+
+###
+// ADMIN: SHARE: get by id
+GET http://localhost:3000/share/1
+
+###
+// ADMIN: delete by id
+DELETE http://localhost:3000/share/1

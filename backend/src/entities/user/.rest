@@ -1,0 +1,19 @@
+###
+// ADMIN: get all
+GET http://localhost:3000/user
+
+###
+// get profile
+GET http://localhost:3000/user/profile
+
+###
+// ADMIN: USER: get by id
+GET http://localhost:3000/user/1
+
+###
+// ADMIN: delete by id
+DELETE http://localhost:3000/user/1
+
+###
+// delete by id
+DELETE http://localhost:3000/user
