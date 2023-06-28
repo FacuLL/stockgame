@@ -1,10 +1,6 @@
 import { Request } from "express";
-import { JWTRequestContent } from "../jwt/jwt.request";
-
-export type AdminRequestContent = JWTRequestContent & {
-    admin: boolean
-}
+import { Admin } from "src/entities/admin/entities/admin.entity";
 
 export interface AdminRequest extends Request {
-  user?: AdminRequestContent
+  admin?: Admin
 }

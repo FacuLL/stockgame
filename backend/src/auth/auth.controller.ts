@@ -5,6 +5,8 @@ import { Public } from './public/public.decorator';
 import { BasicUserRequest } from './basicuser/basicuser.request';
 import { InstitutionRequest } from './institution/institution.request';
 import { InstitutionAuthGuard } from './institution/institution.guard';
+import { AdminRequest } from './admin/admin.request';
+import { AdminAuthGuard } from './admin/admin.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +25,12 @@ export class AuthController {
     @Post('login/institution')
     institutionLogin(@Request() req: InstitutionRequest) {
         return this.authService.loginInstitution(req);
+    }
+
+    @Public()
+    @UseGuards(AdminAuthGuard)
+    @Post('login/admin')
+    adminLogin(@Request() req: AdminRequest) {
+        return this.authService.loginAdmin(req);
     }
 }

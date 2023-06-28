@@ -10,6 +10,10 @@ import { Institution } from 'src/entities/institution/entities/institution.entit
 import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
 import { InstitutionRequest } from './institution/institution.request';
 import { User } from 'src/entities/user/entities/user.entity';
+import { Admin } from 'src/entities/admin/entities/admin.entity';
+import { AdminLoginDto } from './admin/adminlogin.dto';
+import { AdminRequest } from './admin/admin.request';
+import { AdminJWTRequestContent } from './admin-jwt/admin-jwt.request';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +21,7 @@ export class AuthService {
         @InjectRepository(BasicUser) private readonly basicUserRepostory: Repository<BasicUser>,
         @InjectRepository(Institution) private readonly institutionRepostory: Repository<Institution>,
         @InjectRepository(User) private readonly userRepostory: Repository<User>,
+        @InjectRepository(Admin) private readonly adminRepostory: Repository<Admin>,
         private jwtService: JwtService
     ) {}
 
@@ -47,7 +52,21 @@ export class AuthService {
         return user;
     }
 
-    async validateAdmin(userid: number): Promise<Boolean> {
+    async loginAdmin(req: AdminRequest) {
+      const payload: AdminJWTRequestContent = { userid: req.admin.user.userid, type: "admin", entityid: req.admin.adminid, admin: true };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
+    }
+
+    async validateAdmin(data: AdminLoginDto): Promise<Admin> {
+      let options: FindOneOptions = { where: { username: data.username }, relations: ['user'], select: ['adminid', 'username', 'password'] };
+      const admin: Admin = await this.adminRepostory.findOne(options);
+      if (!admin || !await admin.comparePassword(data.password) || admin.user.type != "admin") return null;
+      return admin;
+    }
+
+    async validateJWTAdmin(userid: number): Promise<Boolean> {
       const user: User = await this.userRepostory.findOne({ where: { userid: userid } });
       if (user.type != "admin") return false;
       return true;

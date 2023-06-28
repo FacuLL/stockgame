@@ -10,8 +10,10 @@ import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
 import { User } from 'src/entities/user/entities/user.entity';
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionStrategy } from './institution/institution.strategy';
-import { AdminStrategy } from './admin/admin.strategy';
+import { AdminJWTStrategy } from './admin-jwt/admin-jwt.strategy';
 import * as dotenv from 'dotenv';
+import { Admin } from 'src/entities/admin/entities/admin.entity';
+import { AdminStrategy } from './admin/admin.strategy';
 dotenv.config();
 
 @Module({
@@ -20,10 +22,10 @@ dotenv.config();
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '10d' }
     }),
-    TypeOrmModule.forFeature([BasicUser, User, Institution]),
+    TypeOrmModule.forFeature([BasicUser, User, Institution, Admin]),
     PassportModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, BasicUserStrategy, JwtStrategy, InstitutionStrategy, AdminStrategy]
+  providers: [AuthService, BasicUserStrategy, JwtStrategy, InstitutionStrategy, AdminJWTStrategy, AdminStrategy]
 })
 export class AuthModule {}
