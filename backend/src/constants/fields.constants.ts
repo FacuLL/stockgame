@@ -16,7 +16,11 @@ export const fields = {
         max: 70
     },
     title: {
-        min: 0,
+        min: 1,
         max: 20
+    },
+    url: {
+        min: 3,
+        max: 2048
     }
 };

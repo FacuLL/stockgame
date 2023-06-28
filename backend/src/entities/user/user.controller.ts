@@ -5,13 +5,13 @@ import { User } from './entities/user.entity';
 import { BasicUser } from '../basicuser/entities/basicuser.entity';
 import { Institution } from '../institution/entities/institution.entity';
 import { FindUserDto } from './dto/find-user.dto';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get()
   findAll(@Query() params: FindUserDto): Promise<User[]> {
     return this.userService.findAll(params);
@@ -22,7 +22,7 @@ export class UserController {
     return this.userService.getProfile(req);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.userService.findOne(+id);
@@ -33,7 +33,7 @@ export class UserController {
     return this.userService.deleteAccount(req);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.userService.delete(+id);

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { FindGameDto } from './dto/find-game.dto';
 
@@ -15,19 +15,19 @@ export class GameController {
     return this.gameService.createInstitutionGame(req, createGameDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Post('/global')
   createGlobalGame(@Body() createGameDto: CreateGameDto) {
     return this.gameService.createGlobalGame(createGameDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get()
   findAll(@Query() params: FindGameDto) {
     return this.gameService.findAll(params);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gameService.findOne(+id);
@@ -38,7 +38,7 @@ export class GameController {
     return this.gameService.updateInstitutionGame(req, +id, updateGameDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Delete('admin/:id')
   delete(@Param('id') id: string) {
     return this.gameService.delete(+id);

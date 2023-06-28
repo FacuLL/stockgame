@@ -5,37 +5,37 @@ import { UpdateCurrencyDto } from './dto/update-currency.dto';
 import { CreateAssetDto } from '../asset/dto/create-asset.dto';
 import { FindAssetDto } from '../asset/dto/find-asset-dto';
 import { UpdateAssetDto } from '../asset/dto/update-asset.dto';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 
 @Controller('currency')
 export class CurrencyController {
   constructor(private readonly currencyService: CurrencyService) {}
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Post()
   create(@Body() createCurrencyDto: CreateCurrencyDto, @Body() createAssetDto: CreateAssetDto) {
     return this.currencyService.create(createAssetDto, createCurrencyDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get()
   findAll(@Query() params: FindAssetDto) {
     return this.currencyService.findAll(params);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.currencyService.findOne(+id);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCurrencyDto: UpdateCurrencyDto, @Body() updateAssetDto: UpdateAssetDto) {
     return this.currencyService.update(+id, updateAssetDto, updateCurrencyDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.currencyService.delete(+id);

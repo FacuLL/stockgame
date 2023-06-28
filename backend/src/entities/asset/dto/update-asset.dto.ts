@@ -17,9 +17,6 @@ export class UpdateAssetDto extends PartialType(CreateAssetDto) {
     automatized: boolean
     @IsOptional()
     @IsNotEmpty()
-    image?: string
-    @IsOptional()
-    @IsNotEmpty()
     @IsInt()
     providerid: number
 }

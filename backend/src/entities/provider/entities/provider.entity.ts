@@ -19,6 +19,9 @@ export class Provider {
     @Column()
     assetendpoint: string;
 
+    @Column({nullable: true, select: false})
+    private secretkey?: string;
+
     @OneToMany(() => Asset, (asset) => asset.provider)
     assets: Asset[];
 

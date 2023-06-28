@@ -5,17 +5,17 @@ import { IsBoolean, IsDate, IsDecimal, IsOptional } from "class-validator";
 
 export class FindGameDto extends PartialType(CreateGameDto) {
     @IsOptional()
-    title: string
+    title?: string
     @IsOptional()
     @Type(() => Date)
     @IsDate()
     finishDate?: Date
     @IsOptional()
     @IsDecimal({ decimal_digits: "2" })
-    initialCash: number
+    initialCash?: number
     @IsOptional()
     @IsBoolean()
-    finished: boolean
+    finished?: boolean
     @IsOptional()
-    currencysimbol: string
+    currencysymbol?: string
 }

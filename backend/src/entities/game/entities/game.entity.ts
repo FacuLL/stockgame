@@ -44,7 +44,7 @@ export class Game {
   global: boolean;
 
   @Column({ nullable: true })
-  currencysimbol?: string;
+  currencysymbol?: string;
 
   @ManyToOne(() => Institution, (institution) => institution.ownergames)
   @JoinColumn()
@@ -75,6 +75,7 @@ export class Game {
       }
       this.startDate = new Date();
       this.maincurrency = maincurrency;
+      if (!data.currencysymbol) this.currencysymbol = "$";
     }
   }
 

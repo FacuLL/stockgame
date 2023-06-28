@@ -24,9 +24,6 @@ import { InstitutionToGame } from 'src/relations/entities/institution-game.entit
   export class Institution {
     @PrimaryGeneratedColumn()
     institutionid: number;
-  
-    @Column({ length: fields.name.max })
-    name: string;
 
     @Column({ length: fields.email.max, nullable: true })
     email?: string;

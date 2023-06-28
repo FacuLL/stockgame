@@ -5,6 +5,7 @@ import { Provider } from "src/entities/provider/entities/provider.entity";
 import { CreateAssetDto } from "../dto/create-asset.dto";
 import { UpdateAssetDto } from "../dto/update-asset.dto";
 import { Currency } from "src/entities/currency/entities/currency.entity";
+import { ConflictException } from "@nestjs/common";
 
 @Index("assetid_UNIQUE", ["assetid"], { unique: true })
 @Entity("asset", { schema: "marketgame" })
@@ -30,13 +31,13 @@ export class Asset {
   @Column()
   available: boolean;
 
-  @Column({ precision: 9, scale: 2 })
+  @Column({ precision: 9, scale: 2, nullable: true })
   dayhigh: string;
 
-  @Column({ precision: 9, scale: 2 })
+  @Column({ precision: 9, scale: 2, nullable: true })
   daylow: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({nullable: true})
   lastupdate: Date;
 
   @OneToMany(() => AssetToGame, (assetgame) => assetgame.asset)
@@ -46,16 +47,18 @@ export class Asset {
   @JoinColumn()
   currency: Currency;
 
-  @ManyToOne(() => Provider, (provider) => provider.assets)
+  @ManyToOne(() => Provider, (provider) => provider.assets, {nullable: true})
   @JoinColumn()
   provider: Provider;
 
-  constructor(data: CreateAssetDto, provider: Provider, currency?: Currency) {
+  constructor(data: CreateAssetDto, provider?: Provider, currency?: Currency) {
     for (let property in data) {
       this[property] = data[property];
     }
-    this.provider = provider;
+    if (this.provider) this.provider = provider;
+    else if (this.automatized) throw new ConflictException('Provider required if automatization is enabled');
     if (currency) this.currency = currency;
+    else this.available = false;
   }
 
   updateData(data: UpdateAssetDto): void {

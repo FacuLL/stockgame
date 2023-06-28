@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Request, UseGuards, Query } from '@
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { FindTransactionDto } from './dto/find-transaction.dto';
 
 @Controller('transaction')
@@ -14,13 +14,13 @@ export class TransactionController {
     return this.transactionService.create(req, createTransactionDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get()
   findAll(@Query() params: FindTransactionDto) {
     return this.transactionService.findAll(params);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.transactionService.findOne(+id);

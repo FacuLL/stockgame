@@ -10,11 +10,9 @@ export class CreateAssetDto {
     @IsNotEmpty()
     @IsBoolean()
     automatized: boolean
-    @IsNotEmpty()
-    image?: string
-    @IsNotEmpty()
+    @IsOptional()
     @IsInt()
-    providerid: number
+    providerid? : number
     @IsOptional()
     @IsNotEmpty()
     @IsInt()

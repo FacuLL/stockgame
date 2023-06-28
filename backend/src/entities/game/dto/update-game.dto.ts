@@ -8,7 +8,7 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
     @IsOptional()
     @IsNotEmpty()
     @Length(fields.title.min, fields.title.max)
-    title: string
+    title?: string
     @IsOptional()
     @Type(() => Date)
     @IsDate()
@@ -16,11 +16,11 @@ export class UpdateGameDto extends PartialType(CreateGameDto) {
     @IsOptional()
     @IsNotEmpty()
     @IsDecimal({ decimal_digits: "2" })
-    initialCash: number
+    initialCash?: number
     @IsOptional()
     @IsBoolean()
-    finished: boolean
+    finished?: boolean
     @IsOptional()
     @IsNotEmpty()
-    currencysimbol: string
+    currencysymbol?: string
 }

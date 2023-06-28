@@ -29,7 +29,7 @@ import { UpdatePlanDto } from "../dto/update-plan.dto";
     courses: boolean;
 
     @OneToMany(() => Institution, (institution) => institution.plan)
-    institutions: Institution[]
+    institutions: Institution[];
 
     constructor(data: CreatePlanDto) {
       for (let property in data) {

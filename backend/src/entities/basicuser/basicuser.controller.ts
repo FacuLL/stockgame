@@ -5,7 +5,7 @@ import { CreateUserDto } from 'src/entities/user/dto/create-user.dto';
 import { Public } from 'src/auth/public/public.decorator';
 import { FindBasicuserDto } from './dto/find-basicuser.dto';
 import { BasicUser } from './entities/basicuser.entity';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { UpdateBasicuserDto } from './dto/update-basicuser.dto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
@@ -15,7 +15,7 @@ export class BasicuserController {
   constructor(private readonly basicuserService: BasicuserService) {}
 
   @Public()
-  @Post('register')
+  @Post('')
   create(@Body() createUserDto: CreateUserDto, @Body() createBasicuserDto: CreateBasicuserDto): Promise<HttpStatus> {
     return this.basicuserService.create(createUserDto, createBasicuserDto);
   }
@@ -25,19 +25,19 @@ export class BasicuserController {
     return this.basicuserService.update(req, updateBasicUserDto, updateUserDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get('')
   find(@Query() params: FindBasicuserDto): Promise<BasicUser[]> {
     return this.basicuserService.findAll(params);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: number): Promise<BasicUser> {
     return this.basicuserService.findOne(id);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Delete(':id')
   delete(@Param(':id') id: number): Promise<HttpStatus> {
     return this.basicuserService.delete(id);

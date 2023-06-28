@@ -44,27 +44,28 @@ export class UserService {
     return HttpStatus.OK;
   }
 
-  async getProfile(req: JWTRequest): Promise<User | BasicUser | Institution | Admin> {
-    let entity: User | BasicUser | Institution | Admin;
-    switch(req.user.type) {
-      case USER_TYPE.BASICUSER:
-        entity = await this.basicuserService.findOne(req.user.entityid);
-        if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
-        break;
-      case USER_TYPE.INSTITUTION:
-        entity = await this.institutionService.findOne(req.user.entityid);
-        if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
-        break;
-      case USER_TYPE.ADMIN:
-        entity = await this.adminService.findOne(req.user.entityid);
-        if (entity.user.userid != req.user.userid) throw new UnauthorizedException();
-        break;
-      default:
-        entity = await this.findOne(req.user.userid);
-        if (entity.type != req.user.type) throw new UnauthorizedException();
-        break;
-    }
-    if (!entity) throw new UnauthorizedException();
-    return entity;
+  async getProfile(req: JWTRequest): Promise<User> {
+      let user: User = await this.userRepostory.findOne({ where: { userid: req.user.userid }, relations: { institution: true, basicuser: true } });
+      if (!user) throw new UnauthorizedException();
+      return user;
   }
+  
+  // async getProfile(req: JWTRequest): Promise<any> {
+  //   let entity: any;
+  //   switch(req.user.type) {
+  //     case USER_TYPE.BASICUSER:
+  //       entity = await this.basicuserService.findOne(req.user.entityid);
+  //       break;
+  //     case USER_TYPE.INSTITUTION:
+  //       entity = await this.institutionService.findOne(req.user.entityid);
+  //       break;
+  //     case USER_TYPE.ADMIN:
+  //       entity = await this.adminService.findOne(req.user.entityid);
+  //       break;
+  //     default:
+  //       throw new UnauthorizedException();
+  //   }
+  //   if (!entity || entity.user.userid != req.user.userid) throw new UnauthorizedException();
+  //   return entity;
+  // }
 }

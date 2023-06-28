@@ -5,7 +5,7 @@ import { UpdateInstitutionDto } from './dto/update-institution.dto';
 import { CreateUserDto } from 'src/entities/user/dto/create-user.dto';
 import { FindInstitutionDto } from './dto/find-institution.dto';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
-import { AdminAuthGuard } from 'src/auth/admin/admin.guard';
+import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { Institution } from './entities/institution.entity';
 
 @Controller('institution')
@@ -17,13 +17,13 @@ export class InstitutionController {
     return this.institutionService.create(createUserDto, createInstitutionDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get()
   findAll(@Query() params: FindInstitutionDto): Promise<Institution[]> {
     return this.institutionService.findAll(params);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Institution> {
     return this.institutionService.findOne(+id);
@@ -34,7 +34,7 @@ export class InstitutionController {
     return this.institutionService.update(req, updateInstitutionDto);
   }
 
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(AdminJWTAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string): Promise<HttpStatus> {
     return this.institutionService.delete(+id);

@@ -32,19 +32,13 @@ export class User {
   @Column("varchar")
   type: UserType;
 
-  @OneToOne(() => Institution, (institution) => institution.user, {
-    cascade: true
-  })
+  @OneToOne(() => Institution, (institution) => institution.user)
   institution: Institution;
 
-  @OneToOne(() => BasicUser, (basicuser) => basicuser.user, {
-    cascade: true
-  })
+  @OneToOne(() => BasicUser, (basicuser) => basicuser.user)
   basicuser: BasicUser;
 
-  @OneToOne(() => Admin, (admin) => admin.user, {
-    cascade: true
-  })
+  @OneToOne(() => Admin, (admin) => admin.user)
   admin: Admin;
 
   @OneToMany(() => UserToGame, (usertogame) => usertogame.user)
