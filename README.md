@@ -1,4 +1,8 @@
-# Marketgame
+<p align="center">
+  <img src="https://github.com/FacuLL/stockgame/assets/69525757/2c4b8de7-b945-482a-a3cd-26031d13d61b" width="200px" />
+</p>
+
+# Stockgame
 
 Simulador de compra y venta de activos financieros, proyecto llevado a cabo en el 7mo año del secundario (tecnicatura).
 Cabe destacar que el proyecto es un remake del juego de mercado anterior, realizado anteriormente por alumnos de la Universidad Nacional del Centro de Tandil.
