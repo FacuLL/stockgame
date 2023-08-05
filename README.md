@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/FacuLL/stockgame/assets/69525757/2c4b8de7-b945-482a-a3cd-26031d13d61b" width="200px" />
+  <img src="https://github.com/FacuLL/stockgame/assets/69525757/18361409-018b-4a06-9dc7-c7dd3201b463" width="200px" />
 </p>
 
 # Stockgame
