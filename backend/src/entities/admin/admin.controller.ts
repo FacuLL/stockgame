@@ -8,6 +8,7 @@ import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('admin')
 export class AdminController {

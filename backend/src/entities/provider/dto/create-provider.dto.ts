@@ -13,4 +13,14 @@ export class CreateProviderDto {
     @IsOptional()
     @IsNotEmpty()
     secretkey?: string;
+    @IsNotEmpty()
+    pathtoopen: string;
+    @IsNotEmpty()
+    pathtohigh: string;
+    @IsNotEmpty()
+    pathtolow: string;
+    @IsNotEmpty()
+    pathtovolume: string;
+    @IsNotEmpty()
+    pathtoprice: string;
 }

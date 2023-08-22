@@ -22,7 +22,7 @@ export class CurrencyService {
 
   async create(createAssetDto: CreateAssetDto, createCurrencyDto: CreateCurrencyDto): Promise<HttpStatus> {
     let provider: Provider = createAssetDto.providerid ? await this.providerRepostory.findOne({ where: { providerid: createAssetDto.providerid } }) : null;
-    if (!provider && !createAssetDto.providerid) throw new NotFoundException();
+    if (!provider && !createAssetDto.providerid && createAssetDto.automatized) throw new NotFoundException();
     let maincurrency: Currency = !createCurrencyDto.main ? await this.currencyRepostory.findOne({ where: { main: true } }) : null;
     if (!maincurrency && !createCurrencyDto.main) throw new ConflictException();
     const queryRunner = this.dataSource.createQueryRunner();

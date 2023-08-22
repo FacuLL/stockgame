@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
 import { AuthService } from '../auth.service';
-import { BasicUserLoginDto } from './userlogin.dto';
 
 @Injectable()
 export class BasicUserStrategy extends PassportStrategy(Strategy, 'basicuser') {

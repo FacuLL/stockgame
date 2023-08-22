@@ -21,6 +21,8 @@ export class AdminService {
     private dataSource: DataSource
   ) {}
 
+  // ADMINS 
+
   async create(createUserDto: CreateUserDto, createAdminDto: CreateAdminDto): Promise<HttpStatus> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -52,8 +54,6 @@ export class AdminService {
     this.adminRepostory.save(admin);
     return HttpStatus.OK;
   }
-
-  // ADMINS 
 
   findAll(params: FindAdminDto): Promise<Admin[]> {
     let options: FindManyOptions<Admin> = { where: {...params}, relations: { user: true } };

@@ -26,10 +26,10 @@ export class AuthService {
     ) {}
 
     async loginInstitution(req: InstitutionRequest) {
-      const payload: JWTRequestContent = { userid: req.user.user.userid, type: "institution", entityid: req.user.institutionid };
-      return {
-        access_token: this.jwtService.sign(payload),
-      };
+        const payload: JWTRequestContent = { userid: req.user.user.userid, type: "institution", entityid: req.user.institutionid };
+        return {
+          access_token: this.jwtService.sign(payload),
+        };
     }
 
     async validateInstitution(data: InstitutionLoginDto): Promise<Institution> {
@@ -53,22 +53,22 @@ export class AuthService {
     }
 
     async loginAdmin(req: AdminRequest) {
-      const payload: AdminJWTRequestContent = { userid: req.admin.user.userid, type: "admin", entityid: req.admin.adminid, admin: true };
-      return {
-        access_token: this.jwtService.sign(payload),
-      };
+        const payload: AdminJWTRequestContent = { userid: req.user.user.userid, type: "admin", entityid: req.user.adminid, admin: true };
+        return {
+          access_token: this.jwtService.sign(payload),
+        };
     }
 
     async validateAdmin(data: AdminLoginDto): Promise<Admin> {
-      let options: FindOneOptions = { where: { username: data.username }, relations: ['user'], select: ['adminid', 'username', 'password'] };
-      const admin: Admin = await this.adminRepostory.findOne(options);
-      if (!admin || !await admin.comparePassword(data.password) || admin.user.type != "admin") return null;
-      return admin;
+        let options: FindOneOptions = { where: { username: data.username }, relations: ['user'], select: ['adminid', 'username', 'password'] };
+        const admin: Admin = await this.adminRepostory.findOne(options);
+        if (!admin || !await admin.comparePassword(data.password) || admin.user.type != "admin") return null;
+        return admin;
     }
 
-    async validateJWTAdmin(userid: number): Promise<Boolean> {
-      const user: User = await this.userRepostory.findOne({ where: { userid: userid } });
-      if (user.type != "admin") return false;
-      return true;
+    async validateJWTAdmin(userid: number, adminid: number): Promise<Boolean> {
+        const user: User = await this.userRepostory.findOne({ where: { userid: userid }, relations: { admin: true } });
+        if (user.type != "admin" || user.admin.adminid != adminid) return false;
+        return true;
     }
 }

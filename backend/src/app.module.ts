@@ -19,6 +19,9 @@ import { AssetModule } from './entities/asset/asset.module';
 import { RelationsModule } from './relations/relations.module';
 import { CurrencyModule } from './entities/currency/currency.module';
 import { AdminModule } from './entities/admin/admin.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './tasks/tasks.module';
+import { HistoricalassetModule } from './entities/historicalasset/historicalasset.module';
 
 @Module({
   imports: [
@@ -36,7 +39,8 @@ import { AdminModule } from './entities/admin/admin.module';
       synchronize: true
     }),
     ConfigModule.forRoot(),
-    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule, AssetModule, RelationsModule, CurrencyModule, AdminModule
+    ScheduleModule.forRoot(),
+    GameModule, UserModule, ShareModule, BasicuserModule, TransactionModule, InstitutionModule, PlanModule, ProviderModule, AuthModule, AssetModule, RelationsModule, CurrencyModule, AdminModule, TasksModule, HistoricalassetModule
   ],
   controllers: [AppController],
   providers: [AppService, {

@@ -10,7 +10,8 @@ content-type: application/json
 
 ###
 // Update profile
-PATCH http://localhost:3000/basicuser/1
+PATCH http://localhost:3000/basicuser/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjEsInR5cGUiOiJiYXNpY3VzZXIiLCJlbnRpdHlpZCI6MSwiaWF0IjoxNjg4MTU3ODU3LCJleHAiOjE2ODkwMjE4NTd9.MbB1myD7mVzjaVsQyI4_x_iQJaKA51VnaXa7ROrz-pU
 content-type: application/json
 
 {

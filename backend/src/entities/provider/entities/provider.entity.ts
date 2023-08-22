@@ -16,11 +16,29 @@ export class Provider {
     @Column()
     url: string;
 
-    @Column()
-    assetendpoint: string;
+    @Column({nullable: true})
+    assetendpoint?: string;
+
+    @Column({nullable: true})
+    historicalendpoint?: string;
 
     @Column({nullable: true, select: false})
     private secretkey?: string;
+
+    @Column()
+    pathtoopen: string;
+
+    @Column()
+    pathtohigh: string;
+
+    @Column()
+    pathtolow: string;
+
+    @Column()
+    pathtovolume: string;
+
+    @Column()
+    pathtoprice: string;
 
     @OneToMany(() => Asset, (asset) => asset.provider)
     assets: Asset[];

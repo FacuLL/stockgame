@@ -5,6 +5,7 @@ GET http://localhost:3000/user
 ###
 // get profile
 GET http://localhost:3000/user/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjEsInR5cGUiOiJiYXNpY3VzZXIiLCJlbnRpdHlpZCI6MSwiaWF0IjoxNjg3OTczNzU1LCJleHAiOjE2ODg4Mzc3NTV9.AtngoBkCQ4z286v2v5mY3S5vBF-jDgPZDKHMLDzl33g
 
 ###
 // ADMIN: USER: get by id

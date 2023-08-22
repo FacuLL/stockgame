@@ -10,7 +10,6 @@ import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
 import { User } from 'src/entities/user/entities/user.entity';
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionStrategy } from './institution/institution.strategy';
-import { AdminJWTStrategy } from './admin-jwt/admin-jwt.strategy';
 import * as dotenv from 'dotenv';
 import { Admin } from 'src/entities/admin/entities/admin.entity';
 import { AdminStrategy } from './admin/admin.strategy';
@@ -26,6 +25,7 @@ dotenv.config();
     PassportModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, BasicUserStrategy, JwtStrategy, InstitutionStrategy, AdminJWTStrategy, AdminStrategy]
+  providers: [AuthService, BasicUserStrategy, JwtStrategy, InstitutionStrategy, AdminStrategy],
+  exports: [AuthService]
 })
 export class AuthModule {}

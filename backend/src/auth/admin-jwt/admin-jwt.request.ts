@@ -6,5 +6,5 @@ export type AdminJWTRequestContent = JWTRequestContent & {
 }
 
 export interface AdminJWTRequest extends Request {
-  admin?: AdminJWTRequestContent
+    user?: AdminJWTRequestContent
 }

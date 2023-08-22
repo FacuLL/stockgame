@@ -1,11 +1,12 @@
 // ADMIN: Register
 POST http://localhost:3000/admin
 content-type: application/json
+
 {
-    "username": "prueba1",
-    "password": "Prueba123",
+    "username": "admin",
+    "password": "Admin123",
     "email": "prueba1@gmail.com",
-    "name": "Prueba 1"
+    "name": "Administrador"
 }
 
 ###
@@ -24,11 +25,13 @@ content-type: application/json
 
 ###
 // ADMIN: get all
-GET http://localhost:3000/admin
+GET http://localhost:3000/admin   
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjMsInR5cGUiOiJhZG1pbiIsImVudGl0eWlkIjoxLCJhZG1pbiI6dHJ1ZSwiaWF0IjoxNjg4MjM5NTE2LCJleHAiOjE2ODkxMDM1MTZ9.PEvA2IoHiscwo9mxcuN_JkK1KcY_98gwp58aivdCYBo
 
 ###
 // ADMIN: get by id
 GET http://localhost:3000/admin/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjMsInR5cGUiOiJhZG1pbiIsImVudGl0eWlkIjoxLCJhZG1pbiI6dHJ1ZSwiaWF0IjoxNjg4MTU4NDU0LCJleHAiOjE2ODkwMjI0NTR9.umZ5d_6jRU5qmrAFqGFGVOhwx4vXYLu0k_9ytQ2mZ3w
 
 ###
 // ADMIN: delete by id

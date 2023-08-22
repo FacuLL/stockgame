@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from './entities/game.entity';
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { Currency } from '../currency/entities/currency.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game, Institution, Currency])],
+  imports: [TypeOrmModule.forFeature([Game, Institution, Currency]), AuthModule],
   controllers: [GameController],
   providers: [GameService]
 })

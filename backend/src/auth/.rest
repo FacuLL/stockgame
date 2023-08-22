@@ -1,0 +1,28 @@
+// PUBLIC: Basic user login
+POST http://localhost:3000/auth/login/user
+content-type: application/json
+
+{
+    "username": "prueba123",
+    "password": "Prueba123"
+}
+
+###
+// PUBLIC: Institution login
+POST http://localhost:3000/auth/login/institution
+content-type: application/json
+
+{
+    "username": "prueba123",
+    "password": "Prueba123"
+}
+
+###
+// PUBLIC: Admin login
+POST http://localhost:3000/auth/login/admin
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "Admin123"
+}

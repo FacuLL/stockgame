@@ -1,7 +1,8 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../public/public.decorator';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -18,5 +19,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           return true;
         }
         return super.canActivate(context);
+      }
+
+      handleRequest(err: any, user: any, info: any, context: any, status: any) {
+        if (info instanceof JsonWebTokenError) {
+          console.log(info);
+          throw new UnauthorizedException('User Guard Error');
+        }
+    
+        return super.handleRequest(err, user, info, context, status);
       }
 }

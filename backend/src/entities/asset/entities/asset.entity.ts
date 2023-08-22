@@ -6,6 +6,7 @@ import { CreateAssetDto } from "../dto/create-asset.dto";
 import { UpdateAssetDto } from "../dto/update-asset.dto";
 import { Currency } from "src/entities/currency/entities/currency.entity";
 import { ConflictException } from "@nestjs/common";
+import { HistoricalAsset } from "src/entities/historicalasset/entities/historicalasset.entity";
 
 @Index("assetid_UNIQUE", ["assetid"], { unique: true })
 @Entity("asset", { schema: "marketgame" })
@@ -31,11 +32,20 @@ export class Asset {
   @Column()
   available: boolean;
 
-  @Column({ precision: 9, scale: 2, nullable: true })
-  dayhigh: string;
+  @Column("decimal",{ precision: 9, scale: 2, nullable: true })
+  open: string;
 
-  @Column({ precision: 9, scale: 2, nullable: true })
-  daylow: string;
+  @Column("decimal",{ precision: 9, scale: 2, nullable: true })
+  volume: string;
+
+  @Column("decimal",{ precision: 9, scale: 2, nullable: true })
+  high: string;
+
+  @Column("decimal",{ precision: 9, scale: 2, nullable: true })
+  low: string;
+
+  @Column("decimal",{ precision: 9, scale: 2, nullable: true })
+  price: string;
 
   @CreateDateColumn({nullable: true})
   lastupdate: Date;
@@ -50,6 +60,9 @@ export class Asset {
   @ManyToOne(() => Provider, (provider) => provider.assets, {nullable: true})
   @JoinColumn()
   provider: Provider;
+
+  @OneToMany(() => HistoricalAsset, historicalasset => historicalasset.asset)
+  historical: HistoricalAsset[];
 
   constructor(data: CreateAssetDto, provider?: Provider, currency?: Currency) {
     for (let property in data) {
