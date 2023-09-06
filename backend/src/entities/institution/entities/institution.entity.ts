@@ -3,6 +3,7 @@ import {
     Column,
     Entity,
     Index,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     ManyToOne,
@@ -42,10 +43,9 @@ import { InstitutionToGame } from 'src/relations/entities/institution-game.entit
     games: Game[];
 
     @OneToOne(() => User, (user) => user.institution, {
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE"
+      cascade: true
     })
-    @JoinTable()
+    @JoinColumn()
     user: User;
 
     @OneToMany(() => Game, (game) => game.owner)

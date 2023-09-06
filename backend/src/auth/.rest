@@ -1,19 +1,19 @@
 // PUBLIC: Basic user login
-POST http://localhost:3000/auth/login/user
+POST http://localhost:3001/auth/login/user
 content-type: application/json
 
 {
-    "username": "prueba123",
+    "username": "prueba1",
     "password": "Prueba123"
 }
 
 ###
 // PUBLIC: Institution login
-POST http://localhost:3000/auth/login/institution
+POST http://localhost:3001/auth/login/institution
 content-type: application/json
 
 {
-    "username": "prueba123",
+    "email": "eata@mail.com",
     "password": "Prueba123"
 }
 

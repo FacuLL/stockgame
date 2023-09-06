@@ -7,11 +7,13 @@ import { FindInstitutionDto } from './dto/find-institution.dto';
 import { JWTRequest } from 'src/auth/jwt/jwt.request';
 import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
 import { Institution } from './entities/institution.entity';
+import { Public } from 'src/auth/public/public.decorator';
 
 @Controller('institution')
 export class InstitutionController {
   constructor(private readonly institutionService: InstitutionService) {}
 
+  @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto, @Body() createInstitutionDto: CreateInstitutionDto): Promise<HttpStatus> {
     return this.institutionService.create(createUserDto, createInstitutionDto);

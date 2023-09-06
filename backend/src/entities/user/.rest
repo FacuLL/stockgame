@@ -1,11 +1,11 @@
 ###
 // ADMIN: get all
-GET http://localhost:3000/user
+GET http://localhost:3001/user
 
 ###
 // get profile
-GET http://localhost:3000/user/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjEsInR5cGUiOiJiYXNpY3VzZXIiLCJlbnRpdHlpZCI6MSwiaWF0IjoxNjg3OTczNzU1LCJleHAiOjE2ODg4Mzc3NTV9.AtngoBkCQ4z286v2v5mY3S5vBF-jDgPZDKHMLDzl33g
+GET http://localhost:3001/user/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjQsInR5cGUiOiJpbnN0aXR1dGlvbiIsImVudGl0eWlkIjoxLCJpYXQiOjE2OTM2OTY3MDUsImV4cCI6MTY5NDU2MDcwNX0.hJAvcEXhE1uw-NWa9c0dGscSeRtyVvWX_UjGSYq2RiI
 
 ###
 // ADMIN: USER: get by id

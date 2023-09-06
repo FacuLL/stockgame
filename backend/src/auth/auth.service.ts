@@ -33,8 +33,9 @@ export class AuthService {
     }
 
     async validateInstitution(data: InstitutionLoginDto): Promise<Institution> {
-        const institution: Institution = await this.institutionRepostory.findOne({ where: { email: data.email } });
-        if (!await institution.comparePassword(data.password)) return null;
+        let options: FindOneOptions = { where: { email: data.email }, relations: ['user'], select: ['institutionid', 'email', 'password'] };
+        const institution: Institution = await this.institutionRepostory.findOne(options);
+        if (!institution || !await institution.comparePassword(data.password)) return null;
         return institution;
     }
 

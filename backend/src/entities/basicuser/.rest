@@ -1,5 +1,5 @@
 // Register
-POST http://localhost:3000/basicuser
+POST http://localhost:3001/basicuser
 content-type: application/json
 {
     "username": "prueba1",
