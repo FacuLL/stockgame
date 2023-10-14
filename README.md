@@ -13,11 +13,19 @@ Se buscan agregar nuevas funciones y evitar los errores que causaron que la apli
 El backend anteriormente se realizó con Express en Node.js. Con el fin de organizar mejor las entidades y dividir el backend en distintos servicios, se decidió utilizar NestJS como Framework y TypeORM como ORM.
 Utiliza MySQL, por lo que se debe instalar un servidor en la PC y configurar el .env.
 
-### ¿Como hacer el deploy?
+### ¿Como desplegar?
 
 - Clonar el repo.
-- Instalar dependencias "npm i".
-- Iniciar "npm start".
+- Instalar dependencias.
+
+```console
+  npm install
+```
+- Iniciar.
+
+```console
+  npm start
+```
   
 ## Frontend (./web-frontend)
 
