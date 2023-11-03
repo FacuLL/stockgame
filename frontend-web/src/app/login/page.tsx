@@ -2,33 +2,29 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import { FormEvent, useEffect, useState } from 'react';
-import { signIn, useSession } from 'next-auth/react'
+import { FormEvent, useContext, useState } from 'react';
+import { AuthContext } from '../AuthContext';
 
 export default function Login() {
   const router = useRouter();
-  const { status, data } = useSession();
 
   let [error, setError] = useState('');
 
-  useEffect(() => {
-    console.log(data);
-  })
+  let { login } = useContext(AuthContext);
 
-  const login = async (ev: FormEvent<HTMLFormElement>) => {
+  const formLogin = async (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
     let data = {
       username: (document.querySelector('#username') as HTMLInputElement)?.value,
       password: (document.querySelector('#password') as HTMLInputElement)?.value
     }
-    const result = await signIn('credentials', {
-      username: data.username,
-      password: data.password,
-      type: 'user',
-      redirect: false
-    });
-    if (!result?.ok) return setError('Usuario o contraseña incorrectos');
-    router.push('/');
+    try {
+      await login(data);
+      router.push('/');
+    }
+    catch(err: any) {
+      setError(err.message);
+    }
   }
 
   return (
@@ -36,7 +32,7 @@ export default function Login() {
     <div className="bg-gray-100 p-5 flex rounded-2xl shadow-lg w-full max-w-3xl mx-5">
       <div className="w-full md:w-1/2 px-5 py-3">
         <h2 className="text-2xl font-bold text-[#002D74]">Inicia sesión</h2>
-        <form className="mt-6" onSubmit={(e) => login(e)}>
+        <form className="mt-6" onSubmit={(e) => formLogin(e)}>
           <div>
             <label className="block text-gray-700">Nombre de Usuario</label>
             <input type="text" name="username" id="username" className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none" required />

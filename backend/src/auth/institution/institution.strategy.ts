@@ -15,7 +15,7 @@ export class InstitutionStrategy extends PassportStrategy(Strategy, 'institution
       email: email,
       password: password
     });
-    if (!institution) throw new UnauthorizedException();
-    return institution;
+    if (institution) return institution;
+    throw new UnauthorizedException();
   }
 }

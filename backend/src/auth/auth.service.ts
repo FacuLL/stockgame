@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasicUser } from 'src/entities/basicuser/entities/basicuser.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { BasicUserLoginDto } from './basicuser/userlogin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { BasicUserRequest } from './basicuser/basicuser.request';
-import { JWTRequestContent } from './jwt/jwt.request';
+import { JWTRequest, JWTRequestContent } from './jwt/jwt.request';
 import { Institution } from 'src/entities/institution/entities/institution.entity';
 import { InstitutionLoginDto } from './institution/insitutionlogin.dto';
 import { InstitutionRequest } from './institution/institution.request';
@@ -14,6 +14,7 @@ import { Admin } from 'src/entities/admin/entities/admin.entity';
 import { AdminLoginDto } from './admin/adminlogin.dto';
 import { AdminRequest } from './admin/admin.request';
 import { AdminJWTRequestContent } from './admin-jwt/admin-jwt.request';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -25,11 +26,14 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async loginInstitution(req: InstitutionRequest) {
+    async loginInstitution(req: InstitutionRequest, res: Response) {
         const payload: JWTRequestContent = { userid: req.user.user.userid, type: "institution", entityid: req.user.institutionid };
-        return {
-          access_token: this.jwtService.sign(payload),
-        };
+        res.cookie('accessToken', this.jwtService.sign(payload), {
+            expires: new Date(new Date().getTime() + 24 * 10 * 60 * 60 * 1000),
+            sameSite: 'strict',
+            httpOnly: true,
+        });
+        return req.user;
     }
 
     async validateInstitution(data: InstitutionLoginDto): Promise<Institution> {
@@ -39,11 +43,14 @@ export class AuthService {
         return institution;
     }
 
-    async loginUser(req: BasicUserRequest) {
+    async loginUser(req: BasicUserRequest, res: Response) {
         const payload: JWTRequestContent = { userid: req.user.user.userid, type: "basicuser", entityid: req.user.basicuserid };
-        return {
-          access_token: this.jwtService.sign(payload),
-        };
+        res.cookie('accessToken', this.jwtService.sign(payload), {
+            expires: new Date(new Date().getTime() + 24 * 10 * 60 * 60 * 1000),
+            sameSite: 'strict',
+            httpOnly: true,
+        });
+        return req.user;
     }
 
     async validateUser(data: BasicUserLoginDto): Promise<BasicUser> {
@@ -53,11 +60,14 @@ export class AuthService {
         return user;
     }
 
-    async loginAdmin(req: AdminRequest) {
+    async loginAdmin(req: AdminRequest, res: Response) {
         const payload: AdminJWTRequestContent = { userid: req.user.user.userid, type: "admin", entityid: req.user.adminid, admin: true };
-        return {
-          access_token: this.jwtService.sign(payload),
-        };
+        res.cookie('accessToken', this.jwtService.sign(payload), {
+            expires: new Date(new Date().getTime() + 24 * 10 * 60 * 60 * 1000),
+            sameSite: 'strict',
+            httpOnly: true,
+        });
+        return req.user;
     }
 
     async validateAdmin(data: AdminLoginDto): Promise<Admin> {
@@ -71,5 +81,18 @@ export class AuthService {
         const user: User = await this.userRepostory.findOne({ where: { userid: userid }, relations: { admin: true } });
         if (user.type != "admin" || user.admin.adminid != adminid) return false;
         return true;
+    }
+
+    async reloadUser(req: JWTRequest, res: Response) {
+        const relations = [req.user.type];
+        const user: User = await this.userRepostory.findOne({ where: { userid: req.user.userid }, relations: relations });
+        if (user) return user;
+        this.logout(res);
+        throw new UnauthorizedException();
+    }
+
+    async logout(res: Response) {
+        res.clearCookie('access_token');
+        return res.status(200);
     }
 }

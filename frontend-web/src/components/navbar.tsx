@@ -4,11 +4,9 @@ import { Button, DarkThemeToggle, Navbar, Spinner } from 'flowbite-react';
 import NavbarLink from './navbar-link';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import UserDropdown from './user-dropdown';
 
 export default function DefaultNavbar() {
-  const {status, data} = useSession();
   const router = useRouter();
   return (
     <Navbar fluid>
@@ -28,25 +26,25 @@ export default function DefaultNavbar() {
           <NavbarLink href='/'>Inicio</NavbarLink>
           <NavbarLink href='/login'>Acerca de</NavbarLink>
           <NavbarLink href='/login'>Servicio</NavbarLink>
-          <NavbarLink href='/login'>Precios</NavbarLink>
+          <NavbarLink href='/plans'>Precios</NavbarLink>
           <NavbarLink href='/login'>Contacto</NavbarLink>
         </div>
         <div className="flex md:order-2 sm:divide-x divide-gray-300 mt-2 md:mt-0 justify-center">
           <DarkThemeToggle className='mr-2' />
           {
-            { 
-              'authenticated': 
-                <UserDropdown avatar={data?.user.image} name={data?.user.name} email={data?.user.institution?.email || data?.user.basicuser?.email} className='ml-3'></UserDropdown>,
-              'unauthenticated': 
-                <div className='flex items-center'>
-                  <NavbarLink href='/login'>Iniciar sesión</NavbarLink>
-                  <Link href="/register"><Button>Empezá ya</Button></Link>
-                </div>,
-              'loading':
-                <div className='flex items-center px-3'>
-                  <Spinner className='ml-2'></Spinner>
-                </div>
-              }[status]
+            // { 
+            //   'authenticated':  
+            //     <UserDropdown avatar={data?.user.image} name={data?.user.name} email={data?.user.institution?.email || data?.user.basicuser?.email} className='ml-3'></UserDropdown>,
+            //   'unauthenticated': 
+            //     <div className='flex items-center'>
+            //       <NavbarLink href='/login'>Iniciar sesión</NavbarLink>
+            //       <Link href="/register"><Button>Empezá ya</Button></Link>
+            //     </div>,
+            //   'loading':
+            //     <div className='flex items-center px-3'>
+            //       <Spinner className='ml-2'></Spinner>
+            //     </div>
+            //   }[status]
           }
         </div>
       </Navbar.Collapse>

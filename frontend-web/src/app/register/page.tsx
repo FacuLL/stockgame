@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function Login() {
+export default function Register() {
   
     return (
       <section className="border-red-500 mt-8 flex items-center justify-center">
