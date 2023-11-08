@@ -49,6 +49,7 @@ export default function Asset() {
   }
 
   const formatTransactions = (asset: any): any[] => {
+    if (!asset.extra?.instance) return [];
     let transactions: any[] = asset.extra.instance.transactions.filter((t: any) => t.asset.assetid == asset.assetid);
     let output: any[] = [];
     transactions.forEach(transaction => {
@@ -85,7 +86,7 @@ export default function Asset() {
                 <h2 className="text-center">Cotización</h2>
             </Card>
             <Card>
-                <h1 className="text-center text-2xl">{asset?.extra?.stock}</h1>
+                <h1 className="text-center text-2xl">{asset?.extra?.stock ? asset?.extra?.stock : 0}</h1>
                 <h2 className="text-center">En el inventario</h2>
             </Card>
             <Card>

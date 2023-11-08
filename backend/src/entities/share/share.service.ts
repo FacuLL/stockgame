@@ -24,7 +24,7 @@ export class ShareService {
 
   async create(createAssetDto: CreateAssetDto, createShareDto: CreateShareDto): Promise<HttpStatus> {
     let provider: Provider = await this.providerRepostory.findOne({ where: { providerid: createAssetDto.providerid } });
-    if (!provider) throw new NotFoundException();
+    if (!provider && createAssetDto.automatized) throw new NotFoundException();
     let currency: Currency = await this.currencyRepostory.findOne({ where: { currencyid: createAssetDto.currencyid } });
     if (!currency) throw new NotFoundException();
     const queryRunner = this.dataSource.createQueryRunner();
