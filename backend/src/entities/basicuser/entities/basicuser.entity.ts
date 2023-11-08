@@ -63,6 +63,10 @@ export class BasicUser {
     return await bcrypt.compare(password, this.password);
   }
 
+  deletePassword(): void {
+    delete this.password;
+  }
+
   // @OneToMany(() => Teaminvitations, (teaminvitations) => teaminvitations.user)
   // teaminvitations: Teaminvitations[];
 

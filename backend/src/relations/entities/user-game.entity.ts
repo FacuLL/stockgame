@@ -28,14 +28,16 @@ import { Asset } from "src/entities/asset/entities/asset.entity";
     @CreateDateColumn()
     joindate: Date;
 
-    @OneToMany(() => AssetToUser, (assetuser) => assetuser.instance)
+    @OneToMany(() => AssetToUser, (assetuser) => assetuser.instance, {
+      cascade: ['insert', 'update']
+    })
     assets: AssetToUser[];
 
     @OneToMany(() => Transaction, (transaction) => transaction.instance)
     transactions: Transaction[];
   
     @ManyToOne(() => User, (user) => user.games, {
-      cascade: true
+      cascade: ['insert', 'update']
     })
     @JoinColumn()
     user: User;
@@ -49,19 +51,26 @@ import { Asset } from "src/entities/asset/entities/asset.entity";
     constructor(user: User, game: Game) {
       this.user = user;
       this.game = game;
+      this.joindate = new Date;
+      if (game) this.cash = game.initialCash;
+    }
+
+    getCash(): number {
+      let cash: any = this.cash;
+      return parseFloat(cash);
     }
 
     makeTransaction(action: ActionType, asset: Asset, amount: number): void {
-      let assetinstance: AssetToUser = this.assets.find((assetinstance) => assetinstance.asset.assetid == asset.assetid);
-      let mcquotation = this.game.maincurrency.asset.quotation;
-      let operation = asset.quotation * asset.currency.asset.quotation * amount / mcquotation;
+      let index: number = this.assets.findIndex((a) => a.asset.assetid == asset.assetid);
+      let mcquotation = parseFloat(this.game.maincurrency.asset.quotation);
+      let operation = parseFloat(asset.quotation) * parseFloat(asset.currency.asset.quotation) * amount / mcquotation;
       if (action == "buy" && operation > this.cash) throw new ConflictException("Not enough cash");
-      if (action == "sell" && (!assetinstance || assetinstance.stock < amount)) throw new ConflictException("Not enough stock");
+      if (action == "sell" && (index < 0 || this.assets[index].stock < amount)) throw new ConflictException("Not enough stock");
       operation = action == "buy" ? -operation : +operation;
-      this.cash+=operation;
-      if (assetinstance) return assetinstance.changeStock(action, amount);
+      this.cash = this.getCash() + operation;
+      if (index >= 0) return this.assets[index].changeStock(action, amount);
       let newassetinstance = new AssetToUser(this, asset);
-      newassetinstance.stock = amount;
+      newassetinstance.changeStock(action, amount)
       this.assets.push(newassetinstance);
     }
   }

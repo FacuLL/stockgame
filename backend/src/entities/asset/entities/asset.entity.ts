@@ -20,8 +20,8 @@ export class Asset {
   @Column({ length: fields.name.max })
   name: string;
 
-  @Column("decimal", { precision: 9, scale: 2 })
-  quotation: number;
+  @Column("decimal", { precision: 9, scale: 2, nullable: true })
+  quotation?: string;
 
   @Column()
   automatized: boolean;
@@ -29,7 +29,7 @@ export class Asset {
   @Column({ nullable: true })
   image?: string;
 
-  @Column()
+  @Column( { default: true } )
   available: boolean;
 
   @Column("decimal",{ precision: 9, scale: 2, nullable: true })
@@ -45,7 +45,7 @@ export class Asset {
   low: string;
 
   @Column("decimal",{ precision: 9, scale: 2, nullable: true })
-  price: string;
+  variation: string;
 
   @CreateDateColumn({nullable: true})
   lastupdate: Date;

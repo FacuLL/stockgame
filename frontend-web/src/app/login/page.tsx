@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'
-import { FormEvent, useContext, useState } from 'react';
+import { FormEvent, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../AuthContext';
 
 export default function Login() {
@@ -10,7 +10,15 @@ export default function Login() {
 
   let [error, setError] = useState('');
 
-  let { login } = useContext(AuthContext);
+  let { login, validate, session } = useContext(AuthContext);
+
+  useEffect(() => {
+    validateSession();
+  }, [session])
+
+  const validateSession = async () => {
+    if (!await validate(false)) router.push('/dashboard');
+  }
 
   const formLogin = async (ev: FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
@@ -19,7 +27,7 @@ export default function Login() {
       password: (document.querySelector('#password') as HTMLInputElement)?.value
     }
     try {
-      await login(data);
+      await login(data, 'user');
       router.push('/');
     }
     catch(err: any) {

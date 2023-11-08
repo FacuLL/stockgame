@@ -1,6 +1,6 @@
 import { Request } from "express";
-import { Institution } from "src/entities/institution/entities/institution.entity";
+import { User } from "src/entities/user/entities/user.entity";
 
 export interface InstitutionRequest extends Request {
-  user?: Institution
+  user?: User
 }

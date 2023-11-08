@@ -2,13 +2,20 @@
 
 import { Avatar, Dropdown } from 'flowbite-react';
 import DropdownLink from './dropdown-link';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useContext } from 'react';
+import { AuthContext } from '@/app/AuthContext';
 
 export default function UserDropdown(props: {avatar: string, name: string, email:string, className: string}) {
     const router = useRouter();
-    let logout = () => {
-        signOut({ redirect: false }).then(() => router.push("/"));
+    const { logout } = useContext(AuthContext);
+    let onLogout = async () => {
+        try {
+            if (await logout()) router.push('/login');
+        }
+        catch(err) {
+            console.log(err);
+        }
     }
     return (
         <Dropdown
@@ -27,7 +34,7 @@ export default function UserDropdown(props: {avatar: string, name: string, email
             Mi cuenta
         </DropdownLink>
         <Dropdown.Divider />
-        <Dropdown.Item onClick={() => logout()}>
+        <Dropdown.Item onClick={() => onLogout()}>
             Cerrar Sesión
         </Dropdown.Item>
         </Dropdown>

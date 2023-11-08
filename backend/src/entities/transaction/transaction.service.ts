@@ -21,9 +21,9 @@ export class TransactionService {
 
   async create(req: JWTRequest, createTransactionDto: CreateTransactionDto): Promise<HttpStatus> {
     if (req.user.type != USER_TYPE.BASICUSER) throw new UnauthorizedException();
-    let instance: UserToGame = await this.instanceRepostory.findOne({ where: { user: { userid: req.user.userid }, game: { gameid: createTransactionDto.gameid } }, relations: { user: { basicuser: true }, game: true, assets: true } });
+    let instance: UserToGame = await this.instanceRepostory.findOne({ where: { user: { userid: req.user.userid }, game: { gameid: createTransactionDto.gameid } }, relations: ['user', 'user.basicuser', 'game', 'assets', 'assets.asset', 'game.maincurrency', 'game.maincurrency.asset'] });
     if (!instance || !instance.user.basicuser || instance.user.basicuser.basicuserid != req.user.entityid) throw new UnauthorizedException();
-    let asset: Asset = await this.assetRepostory.findOne({ where: { assetid: createTransactionDto.assetid }, relations: { currency: true } });
+    let asset: Asset = await this.assetRepostory.findOne({ where: { assetid: createTransactionDto.assetid }, relations: ['currency', 'currency.asset'] });
     if (!asset) throw new NotFoundException();
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();

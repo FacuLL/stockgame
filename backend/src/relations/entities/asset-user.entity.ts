@@ -27,7 +27,7 @@ import { ConflictException } from "@nestjs/common";
     asset: Asset;
 
     @ManyToOne(() => UserToGame, {
-      cascade: true
+      cascade: ['insert', 'update']
     })
     @JoinColumn()
     instance: UserToGame;
@@ -35,6 +35,7 @@ import { ConflictException } from "@nestjs/common";
     constructor (instance: UserToGame, asset: Asset) {
       this.instance = instance;
       this.asset = asset;
+      this.stock = 0;
     }
 
     changeStock(action: ActionType, amount: number) {

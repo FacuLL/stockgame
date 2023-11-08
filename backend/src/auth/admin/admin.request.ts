@@ -1,6 +1,6 @@
 import { Request } from "express";
-import { Admin } from "src/entities/admin/entities/admin.entity";
+import { User } from "src/entities/user/entities/user.entity";
 
 export interface AdminRequest extends Request {
-  user?: Admin
+  user?: User
 }

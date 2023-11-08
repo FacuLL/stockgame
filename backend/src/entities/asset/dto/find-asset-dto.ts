@@ -8,7 +8,7 @@ export class FindAssetDto {
     @IsOptional()
     name?: string;
     @IsOptional()
-    quotation?: number;
+    quotation?: string;
     @IsOptional()
     automatized?: boolean;
     @IsOptional()

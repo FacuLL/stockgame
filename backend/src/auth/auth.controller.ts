@@ -36,11 +36,6 @@ export class AuthController {
         return this.authService.loginAdmin(req, res);
     }
 
-    @Get('user')
-    reloadUser(@Request() req: JWTRequest, @Response() res: ResponseType) {
-        return this.authService.reloadUser(req, res);
-    }
-
     @Get('validate')
     validate() {
         return true;

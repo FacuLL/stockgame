@@ -22,7 +22,7 @@ export class AssetTasksService {
         if (asset.provider.assetendpoint) {
             let historical: HistoricalAsset = new HistoricalAsset({
               open: asset.open,
-              close: asset.price,
+              close: asset.quotation,
               volume: asset.volume,
               high: asset.high,
               low: asset.low

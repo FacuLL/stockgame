@@ -45,9 +45,7 @@ export class UserService {
   }
 
   async getProfile(req: JWTRequest): Promise<User> {
-      console.log(req.user);
-    
-      let user: User = await this.userRepostory.findOne({ where: { userid: req.user.userid }, relations: { institution: true, basicuser: true } });
+      let user: User = await this.userRepostory.findOne({ where: { userid: req.user.userid }, relations: ['institution', 'admin', 'basicuser', 'games', 'games.game', 'games.game.maincurrency',  'games.game.maincurrency.asset', 'games.transactions', 'games.assets'] });
       if (!user) throw new UnauthorizedException();
       return user;
   }

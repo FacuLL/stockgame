@@ -1,6 +1,6 @@
 import { Request } from "express";
-import { BasicUser } from "src/entities/basicuser/entities/basicuser.entity";
+import { User } from "src/entities/user/entities/user.entity";
 
 export interface BasicUserRequest extends Request {
-    user?: BasicUser
+    user?: User
 }

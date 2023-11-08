@@ -23,7 +23,7 @@ import { Game } from "src/entities/game/entities/game.entity";
     @JoinColumn()
     asset: Asset;
 
-    @ManyToOne(() => Game, (game) => game)
+    @ManyToOne(() => Game, (game) => game.assets)
     @JoinColumn()
     game: Game;
 

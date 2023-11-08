@@ -11,10 +11,13 @@ export class CreateAssetDto {
     @IsBoolean()
     automatized: boolean
     @IsOptional()
+    @IsBoolean()
+    available?: boolean
+    @IsOptional()
     @IsInt()
     providerid? : number
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
-    currencyid: number
+    currencyid?: number
 }

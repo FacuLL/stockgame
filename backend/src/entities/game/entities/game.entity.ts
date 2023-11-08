@@ -40,7 +40,7 @@ export class Game {
   @Column("decimal", { precision: 9, scale: 2 })
   initialCash: number;
 
-  @Column()
+  @Column({ default: false })
   global: boolean;
 
   @Column({ nullable: true })
@@ -63,6 +63,8 @@ export class Game {
   @OneToMany(() => UserToGame, (usertogame) => usertogame.game)
   users: UserToGame[];
 
+  popularassets: AssetToGame[];
+
   constructor(data: CreateGameDto, global: boolean, maincurrency: Currency, institution?: Institution) {
     if (data) {
       for (let property in data) {
@@ -75,7 +77,9 @@ export class Game {
       }
       this.startDate = new Date();
       this.maincurrency = maincurrency;
+      this.global = global;
       if (!data.currencysymbol) this.currencysymbol = "$";
+      if (!data.finishDate) this.finishDate = null;
     }
   }
 

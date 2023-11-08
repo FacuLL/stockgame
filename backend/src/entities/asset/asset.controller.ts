@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, UseGuards, Request } from '@nestjs/common';
 import { AssetService } from './asset.service';
 import { FindAssetDto } from './dto/find-asset-dto';
 import { AdminJWTAuthGuard } from 'src/auth/admin-jwt/admin-jwt.guard';
+import { JWTRequest } from 'src/auth/jwt/jwt.request';
 
 @Controller('asset')
 export class AssetController {
@@ -13,10 +14,9 @@ export class AssetController {
     return this.assetService.findAll(params);
   }
 
-  @UseGuards(AdminJWTAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.assetService.findOne(+id);
+  findOne(@Request() req: JWTRequest, @Param('id') id: string, @Query('gameid') gameid: string) {
+    return this.assetService.findOne(req, +id, +gameid);
   }
 
   @UseGuards(AdminJWTAuthGuard)

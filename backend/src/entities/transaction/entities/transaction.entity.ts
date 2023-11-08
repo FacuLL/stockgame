@@ -23,7 +23,7 @@ export class Transaction {
   date: Date;
 
   @Column("decimal", { precision: 9, scale: 2 })
-  quotation: number;
+  quotation: string;
 
   @Column("varchar")
   action: ActionType;
