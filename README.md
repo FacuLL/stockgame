@@ -13,7 +13,7 @@ Se buscan agregar nuevas funciones y evitar los errores que causaron que la apli
 El backend anteriormente se realizó con Express en Node.js. Con el fin de organizar mejor las entidades y dividir el backend en distintos servicios, se decidió utilizar NestJS como Framework y TypeORM como ORM.
 Utiliza MySQL, por lo que se debe instalar un servidor en la PC y configurar el .env.
 
-### ¿Como desplegar?
+### ¿Cómo desplegar?
 
 - Clonar el repo.
 - Instalar dependencias.
@@ -24,12 +24,26 @@ Utiliza MySQL, por lo que se debe instalar un servidor en la PC y configurar el 
 - Iniciar.
 
 ```console
-  npm start
+  npm run dev
 ```
   
 ## Frontend (./web-frontend)
 
-El frontend aún no está terminado, se comenzó a hacer con AngularJS, pero se planea pasar a React y utilizar Tailwind.
+El frontend aún está incompleto. Utiliza NextJS y flowbite como libreria de componentes.
+
+### ¿Cómo desplegar?
+
+- Clonar el repo.
+- Instalar dependencias.
+
+```console
+  npm install
+```
+- Iniciar.
+
+```console
+  npm run dev
+```
 
 ## Database (./database)
 
