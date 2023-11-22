@@ -38,7 +38,7 @@ export default function PopularAssetsCarousell(props: { gameid: any }) {
                 <p className="text-md">High: {asset.high}</p>
               </Card>
               <div className="flex justify-center mt-4">
-                <Button gradientDuoTone={asset.variation > 0 ? 'greenToBlue' : 'pinkToOrange'} onClick={() => {router.push('/dashboard/game/' + props.gameid + '/asset/' + asset.assetid)}}>Más detalles</Button>
+                <Button gradientDuoTone={asset.variation > 0 ? 'greenToBlue' : 'pinkToOrange'} onClick={() => {router.push('/dashboard/' + props.gameid + '/asset/' + asset.assetid)}}>Más detalles</Button>
               </div>
             </div>
             <div className="px-3 py-5 col-span-2">
